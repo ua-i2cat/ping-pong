@@ -2,7 +2,6 @@
 // See the LICENSE file in the project root for more information.
 // Author: alexandre.via@i2cat.net
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
