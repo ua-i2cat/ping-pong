@@ -1,0 +1,197 @@
+fileFormatVersion: 2
+guid: f644970a7f9e9994b86b5b65533c9b0c
+timeCreated: 1507725176
+licenseType: Free
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: bat
+    100002: bat001
+    100004: Box001
+    100006: Box002
+    100008: Box003
+    100010: Box004
+    100012: Box005
+    100014: Camera001
+    100016: Camera001.Target
+    100018: Capsule001
+    100020: Capsule002
+    100022: Capsule003
+    100024: Capsule004
+    100026: Cylinder001
+    100028: Cylinder002
+    100030: GeoSphere001
+    100032: Line001
+    100034: Line002
+    100036: Line003
+    100038: Line004
+    100040: Line005
+    100042: Line006
+    100044: Plane001
+    100046: Plane002
+    100048: Sky001
+    100050: //RootNode
+    400000: bat
+    400002: bat001
+    400004: Box001
+    400006: Box002
+    400008: Box003
+    400010: Box004
+    400012: Box005
+    400014: Camera001
+    400016: Camera001.Target
+    400018: Capsule001
+    400020: Capsule002
+    400022: Capsule003
+    400024: Capsule004
+    400026: Cylinder001
+    400028: Cylinder002
+    400030: GeoSphere001
+    400032: Line001
+    400034: Line002
+    400036: Line003
+    400038: Line004
+    400040: Line005
+    400042: Line006
+    400044: Plane001
+    400046: Plane002
+    400048: Sky001
+    400050: //RootNode
+    2000000: Camera001
+    2300000: Box001
+    2300002: Box002
+    2300004: Box003
+    2300006: Box004
+    2300008: Box005
+    2300010: Capsule001
+    2300012: Capsule002
+    2300014: Capsule003
+    2300016: Capsule004
+    2300018: Cylinder001
+    2300020: Cylinder002
+    2300022: GeoSphere001
+    2300024: Line001
+    2300026: Line002
+    2300028: Line003
+    2300030: Line004
+    2300032: Line005
+    2300034: Line006
+    2300036: Plane001
+    2300038: Plane002
+    3300000: Box001
+    3300002: Box002
+    3300004: Box003
+    3300006: Box004
+    3300008: Box005
+    3300010: Capsule001
+    3300012: Capsule002
+    3300014: Capsule003
+    3300016: Capsule004
+    3300018: Cylinder001
+    3300020: Cylinder002
+    3300022: GeoSphere001
+    3300024: Line001
+    3300026: Line002
+    3300028: Line003
+    3300030: Line004
+    3300032: Line005
+    3300034: Line006
+    3300036: Plane001
+    3300038: Plane002
+    4300000: Box001
+    4300002: Plane001
+    4300004: Cylinder001
+    4300006: Cylinder002
+    4300008: Box002
+    4300010: Box003
+    4300012: Box004
+    4300014: Box005
+    4300016: Plane002
+    4300018: Line002
+    4300020: Line003
+    4300022: Capsule001
+    4300024: Capsule002
+    4300026: Line001
+    4300028: Line004
+    4300030: Line005
+    4300032: Line006
+    4300034: Capsule003
+    4300036: Capsule004
+    4300038: GeoSphere001
+    9500000: //RootNode
+    10800000: Sky001
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
