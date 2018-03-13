@@ -40,9 +40,3 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-
-# DISABLE TEXTURES GREATER THAN 100MB FOR NOW (WORKAROUND!!!)
-/TFG_VR2/Assets/Materials/rp_alison_rigged_001_*
-/TFG_VR2/Assets/Materials/rp_eric_rigged_001_*
-/TFG_VR2/Assets/Materials/Maps/rp_alison_rigged_001_*
-/TFG_VR2/Assets/Materials/Maps/rp_eric_rigged_001_*
