@@ -1,0 +1,214 @@
+fileFormatVersion: 2
+guid: 076a9e85b24afcd4bb430b89a39a77dd
+timeCreated: 1507193441
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Armature
+    100002: Camera
+    100004: Head
+    100006: Head_end
+    100008: Hip
+    100010: Lamp
+    100012: Left_Ankle_Joint_01
+    100014: Left_Forearm_Joint_01
+    100016: Left_Index_Finger_Joint_01a
+    100018: Left_Index_Finger_Joint_01b
+    100020: Left_Index_Finger_Joint_01c
+    100022: Left_Index_Finger_Joint_01c_end
+    100024: Left_Knee_Joint_01
+    100026: Left_Middle_Finger_Joint_01a
+    100028: Left_Middle_Finger_Joint_01b
+    100030: Left_Middle_Finger_Joint_01c
+    100032: Left_Middle_Finger_Joint_01c_end
+    100034: Left_Pinky_Finger_Joint_01a
+    100036: Left_Pinky_Finger_Joint_01b
+    100038: Left_Pinky_Finger_Joint_01c
+    100040: Left_Pinky_Finger_Joint_01c_end
+    100042: Left_Ring_Finger_Joint_01a
+    100044: Left_Ring_Finger_Joint_01b
+    100046: Left_Ring_Finger_Joint_01c
+    100048: Left_Ring_Finger_Joint_01c_end
+    100050: Left_Shoulder_Joint_01
+    100052: Left_Thigh_Joint_01
+    100054: Left_Thumb_Joint_01a
+    100056: Left_Thumb_Joint_01b
+    100058: Left_Thumb_Joint_01b_end
+    100060: Left_Toe_Joint_01
+    100062: Left_Toe_Joint_01_end
+    100064: Left_Upper_Arm_Joint_01
+    100066: Left_Wrist_Joint_01
+    100068: Neck
+    100070: Ribs
+    100072: Right_Ankle_Joint_01
+    100074: Right_Forearm_Joint_01
+    100076: Right_Index_Finger_Joint_01a
+    100078: Right_Index_Finger_Joint_01b
+    100080: Right_Index_Finger_Joint_01c
+    100082: Right_Index_Finger_Joint_01c_end
+    100084: Right_Knee_Joint_01
+    100086: Right_Middle_Finger_Joint_01a
+    100088: Right_Middle_Finger_Joint_01b
+    100090: Right_Middle_Finger_Joint_01c
+    100092: Right_Middle_Finger_Joint_01c_end
+    100094: Right_Pinky_Finger_Joint_01a
+    100096: Right_Pinky_Finger_Joint_01b
+    100098: Right_Pinky_Finger_Joint_01c
+    100100: Right_Pinky_Finger_Joint_01c_end
+    100102: Right_Ring_Finger_Joint_01a
+    100104: Right_Ring_Finger_Joint_01b
+    100106: Right_Ring_Finger_Joint_01c
+    100108: Right_Ring_Finger_Joint_01c_end
+    100110: Right_Shoulder_Joint_01
+    100112: Right_Thigh_Joint_01
+    100114: Right_Thumb_Joint_01a
+    100116: Right_Thumb_Joint_01b
+    100118: Right_Thumb_Joint_01b_end
+    100120: Right_Toe_Joint_01
+    100122: Right_Toe_Joint_01_end
+    100124: Right_Upper_Arm_Joint_01
+    100126: Right_Wrist_Joint_01
+    100128: //RootNode
+    100130: Robot2
+    100132: Root
+    400000: Armature
+    400002: Camera
+    400004: Head
+    400006: Head_end
+    400008: Hip
+    400010: Lamp
+    400012: Left_Ankle_Joint_01
+    400014: Left_Forearm_Joint_01
+    400016: Left_Index_Finger_Joint_01a
+    400018: Left_Index_Finger_Joint_01b
+    400020: Left_Index_Finger_Joint_01c
+    400022: Left_Index_Finger_Joint_01c_end
+    400024: Left_Knee_Joint_01
+    400026: Left_Middle_Finger_Joint_01a
+    400028: Left_Middle_Finger_Joint_01b
+    400030: Left_Middle_Finger_Joint_01c
+    400032: Left_Middle_Finger_Joint_01c_end
+    400034: Left_Pinky_Finger_Joint_01a
+    400036: Left_Pinky_Finger_Joint_01b
+    400038: Left_Pinky_Finger_Joint_01c
+    400040: Left_Pinky_Finger_Joint_01c_end
+    400042: Left_Ring_Finger_Joint_01a
+    400044: Left_Ring_Finger_Joint_01b
+    400046: Left_Ring_Finger_Joint_01c
+    400048: Left_Ring_Finger_Joint_01c_end
+    400050: Left_Shoulder_Joint_01
+    400052: Left_Thigh_Joint_01
+    400054: Left_Thumb_Joint_01a
+    400056: Left_Thumb_Joint_01b
+    400058: Left_Thumb_Joint_01b_end
+    400060: Left_Toe_Joint_01
+    400062: Left_Toe_Joint_01_end
+    400064: Left_Upper_Arm_Joint_01
+    400066: Left_Wrist_Joint_01
+    400068: Neck
+    400070: Ribs
+    400072: Right_Ankle_Joint_01
+    400074: Right_Forearm_Joint_01
+    400076: Right_Index_Finger_Joint_01a
+    400078: Right_Index_Finger_Joint_01b
+    400080: Right_Index_Finger_Joint_01c
+    400082: Right_Index_Finger_Joint_01c_end
+    400084: Right_Knee_Joint_01
+    400086: Right_Middle_Finger_Joint_01a
+    400088: Right_Middle_Finger_Joint_01b
+    400090: Right_Middle_Finger_Joint_01c
+    400092: Right_Middle_Finger_Joint_01c_end
+    400094: Right_Pinky_Finger_Joint_01a
+    400096: Right_Pinky_Finger_Joint_01b
+    400098: Right_Pinky_Finger_Joint_01c
+    400100: Right_Pinky_Finger_Joint_01c_end
+    400102: Right_Ring_Finger_Joint_01a
+    400104: Right_Ring_Finger_Joint_01b
+    400106: Right_Ring_Finger_Joint_01c
+    400108: Right_Ring_Finger_Joint_01c_end
+    400110: Right_Shoulder_Joint_01
+    400112: Right_Thigh_Joint_01
+    400114: Right_Thumb_Joint_01a
+    400116: Right_Thumb_Joint_01b
+    400118: Right_Thumb_Joint_01b_end
+    400120: Right_Toe_Joint_01
+    400122: Right_Toe_Joint_01_end
+    400124: Right_Upper_Arm_Joint_01
+    400126: Right_Wrist_Joint_01
+    400128: //RootNode
+    400130: Robot2
+    400132: Root
+    4300000: Robot2
+    9500000: //RootNode
+    13700000: Robot2
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
