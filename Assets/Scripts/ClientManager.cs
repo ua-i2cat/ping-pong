@@ -15,9 +15,9 @@ using UnityEngine.UI;
 
 public class ClientManager : MonoBehaviour
 {
-    private Socket socket;    
-    public string ip = "174.83.206.67";
-    public int port = 33333;
+    private Socket socket;
+    public string ip = Constants.IP;
+    public int port = Constants.PORT;
 
     private const int BUFF_SIZE = 8192;
     private byte[] recvBuffer = new byte[BUFF_SIZE];
@@ -31,7 +31,7 @@ public class ClientManager : MonoBehaviour
     private bool spawned = false;
     private Vector3 spawnPos;
 
-    public List<Transform> sendTransforms = new List<Transform>();
+    public AvatarManager avatarManager;
 
     private Oponents oponents = new Oponents();
 
@@ -78,7 +78,7 @@ public class ClientManager : MonoBehaviour
 
         if (spawned)
         {
-            sendTransforms[0].position = spawnPos;
+            avatarManager.body.transform.position = spawnPos;
             spawned = false;
         }
 
@@ -164,9 +164,9 @@ public class ClientManager : MonoBehaviour
     {
         try
         {
-            int bytes_sent = socket.EndSend(AR);
-            if (bytes_sent % 228 != 0)
-                Debug.Log(bytes_sent + " bytes sent");
+            //int bytes_sent = socket.EndSend(AR);
+            //if (bytes_sent % 228 != 0)
+            //    Debug.Log(bytes_sent + " bytes sent");
 
             Thread.Sleep(1000 / packetRate);
         }
@@ -211,34 +211,40 @@ public class ClientManager : MonoBehaviour
                 packet.AddRange(Encoding.ASCII.GetBytes(text));
                 break;
 
-            // Sensor Data (Ref + 6 sensors)
+            // Sensor Data (Ref + 6 sensors)                
             case Packet.PacketType.Sensors:
+                int transformCount = avatarManager.Rig.GetTransformCount();
                 int packetSize = sizeof(short)  // 2 bytes: Length of the packet (in bytes)
                     + sizeof(byte)              // 1 byte:  Packet type
                     + sizeof(byte)              // 1 byte:  Transform Count (up to 255)
-                    + sendTransforms.Count * Trans.Size;
+                    //+ sendTransforms.Count * Trans.Size;
+                    + transformCount * Trans.Size;
 
                 packet.AddRange(BitConverter.GetBytes((short)packetSize));
                 packet.Add((byte)Packet.PacketType.Sensors);
-                packet.Add((byte)sendTransforms.Count);
+                packet.Add((byte)transformCount);
 
-                foreach (var transform in sendTransforms)
+                //foreach (var transform in sendTransforms)
+                for(int i = 0; i < transformCount; i++)
                 {
+                    var t = avatarManager.Rig.GetTransform(i);
+
                     byte[] name = new byte[4];
-                    Debug.Assert(transform.name.Length <= 4, "The transform name is too long!");
-                    Encoding.ASCII.GetBytes(transform.name, 0, transform.name.Length, name, 0);
+                    //Debug.Assert(transform.name.Length <= 4, "The transform name is too long!");
+                    //Encoding.ASCII.GetBytes(transform.name, 0, transform.name.Length, name, 0);
+                    Encoding.ASCII.GetBytes(t.Key, 0, t.Key.Length, name, 0);
 
                     packet.AddRange(name);
                     //packet.AddRange(BitConverter.GetBytes(transform.GetHashCode()));
 
-                    packet.AddRange(BitConverter.GetBytes(transform.position.x));
-                    packet.AddRange(BitConverter.GetBytes(transform.position.y));
-                    packet.AddRange(BitConverter.GetBytes(transform.position.z));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.position.x));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.position.y));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.position.z));
 
-                    packet.AddRange(BitConverter.GetBytes(transform.rotation.x));
-                    packet.AddRange(BitConverter.GetBytes(transform.rotation.y));
-                    packet.AddRange(BitConverter.GetBytes(transform.rotation.z));
-                    packet.AddRange(BitConverter.GetBytes(transform.rotation.w));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.rotation.x));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.rotation.y));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.rotation.z));
+                    packet.AddRange(BitConverter.GetBytes(t.Value.rotation.w));
                 }
                 break;
 

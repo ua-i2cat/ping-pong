@@ -25,7 +25,6 @@ public class AvatarBody : MonoBehaviour
     {
         transform.Translate(v);
     }
-
     public void Rotate(Vector3 euler)
     {
         transform.Rotate(euler);
@@ -35,7 +34,6 @@ public class AvatarBody : MonoBehaviour
     {
         this.onIKAction = onIKAction;
     }
-
     private void OnAnimatorIK(int layerIndex)
     {
         if(onIKAction != null)

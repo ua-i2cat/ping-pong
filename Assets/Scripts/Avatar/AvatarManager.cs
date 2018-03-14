@@ -20,4 +20,6 @@ public class AvatarManager : MonoBehaviour
     {
         controller.Update();
     }
+
+    public AvatarRig Rig { get { return controller.Rig; } }
 }

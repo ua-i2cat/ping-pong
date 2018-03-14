@@ -12,6 +12,8 @@ public abstract class AvatarController
 
     public virtual void Update() { }
 
+    public AvatarRig Rig { get { return rig; } }
+
     protected AvatarBody body;
     protected AvatarRig rig;
 }

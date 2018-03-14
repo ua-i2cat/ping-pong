@@ -19,9 +19,18 @@ public class AvatarVRController : AvatarController
         // Rotate the body in the same direction as the Camera
         body.transform.rotation = Quaternion.Euler(new Vector3(0, rig.GetRigEye().eulerAngles.y, 0));
 
-        if(!rig.GetHip().Key)
+        if(rig.GetTransform(Constants.Hip).Key != null)
         {
             body.transform.position += rig.GetRigEye().position - body.GetBodyEye().position;
+        }
+        else
+        {
+            //throw new System.NotImplementedException();
+        }
+
+        if(rig.GetTransform(Constants.RightFoot).Key != null)
+        {
+            //throw new System.NotImplementedException();
         }
     }
 
@@ -32,13 +41,13 @@ public class AvatarVRController : AvatarController
         animator.SetLookAtWeight(1);
         animator.SetLookAtPosition(eye.position + eye.forward);
 
-        SetIKGoal(animator, AvatarIKGoal.LeftHand, rig.GetLH());
-        SetIKGoal(animator, AvatarIKGoal.RightHand, rig.GetRH());
+        SetIKGoal(animator, AvatarIKGoal.LeftHand, rig.GetTransform(Constants.LeftHand));
+        SetIKGoal(animator, AvatarIKGoal.RightHand, rig.GetTransform(Constants.RightHand));
     }
 
-    private void SetIKGoal(Animator animator, AvatarIKGoal goal, KeyValuePair<bool, Transform> pair)
+    private void SetIKGoal(Animator animator, AvatarIKGoal goal, KeyValuePair<string, Transform> pair)
     {
-        if (pair.Key)
+        if (pair.Key != null)
         {
             animator.SetIKPositionWeight(goal, 1);
             animator.SetIKPosition(goal, pair.Value.position);
