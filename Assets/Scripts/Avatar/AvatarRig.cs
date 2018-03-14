@@ -29,44 +29,66 @@ public abstract class AvatarRig
     {
         return GetTransform(Constants.Eye).Value;
     }
+
+    public abstract void Update();
 }
 
 public class AvatarRigVR : AvatarRig
 {
+    private Transform rig;
+    private Transform bodyEye;
+
     public AvatarRigVR(AvatarBody body)
     {
         try
         {
-            GameObject rig = GameObject.Find("[CameraRig]");
+            rig = GameObject.Find("[CameraRig]").transform;
+            bodyEye = body.GetBodyEye();
 
-            transforms.Add(Constants.Eye, rig.transform.Find("Camera (eye)"));
-            transforms.Add(Constants.LeftHand, rig.transform.Find("Controller (left)").Find("attach"));
-            transforms.Add(Constants.RightHand, rig.transform.Find("Controller (right)").Find("attach"));
-            transforms.Add(Constants.LeftFoot, rig.transform.Find("Foot (left)"));
-            transforms.Add(Constants.RightFoot, rig.transform.Find("Foot (right)"));
+            transforms.Add(Constants.Eye, rig.Find("Camera (eye)"));
+            transforms.Add(Constants.LeftHand, rig.Find("Controller (left)").Find("attach"));
+            transforms.Add(Constants.RightHand, rig.Find("Controller (right)").Find("attach"));
+            transforms.Add(Constants.LeftFoot, rig.Find("Foot (left)"));
+            transforms.Add(Constants.RightFoot, rig.Find("Foot (right)"));
 
             // Move the rig so that it matches the INITIAL position of the body
-            rig.transform.position += body.GetBodyEye().position - GetRigEye().position;
+            rig.position += bodyEye.position - bodyEye.position;
         }
         catch
         {
             Debug.Assert(false, "Invalid Rig for VR");
         }
     }
+
+    public override void Update()
+    {
+        // Move the rig so that it matches the position of the body
+        rig.transform.position += bodyEye.position - bodyEye.position;
+    }
 }
 
 public class AvatarRigCam : AvatarRig
 {
+    private Transform rig;
+    private Transform bodyEye;
+
     public AvatarRigCam(AvatarBody body)
     {
-        GameObject cam = GameObject.FindGameObjectWithTag("MainCamera");
-        Debug.Assert(cam != null && !UnityEngine.XR.XRSettings.enabled,
+        rig = GameObject.FindGameObjectWithTag("MainCamera").transform;
+        bodyEye = body.GetBodyEye();
+        Debug.Assert(rig != null && !UnityEngine.XR.XRSettings.enabled,
             "Incompatible camera configuration!");
 
-        transforms.Add(Constants.Eye, cam.transform);
+        transforms.Add(Constants.Eye, rig);
 
-        cam.transform.position = body.GetBodyEye().position;
-        cam.transform.rotation = body.GetBodyEye().rotation;
-        cam.transform.parent = body.transform;
+        rig.position = bodyEye.position;
+        rig.rotation = bodyEye.rotation;
+        rig.parent = body.transform;
+    }
+
+    public override void Update()
+    {
+        rig.position = bodyEye.position;
+        rig.rotation = bodyEye.rotation;
     }
 }

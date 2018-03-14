@@ -11,7 +11,7 @@ public class ClientData
     public Socket socket;
     private Dictionary<string, Trans> transforms = new Dictionary<string, Trans>();
     public GameObject instance;
-    public Vector3 spawnPos;
+    public Trans spawn;
 
     public const int BUFF_SIZE = 8192;
     public byte[] recvBuffer = new byte[BUFF_SIZE];

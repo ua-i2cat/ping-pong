@@ -11,6 +11,7 @@ public class AvatarNetworkController : AvatarController
 
     public override void Update()
     {
+        base.Update();
         throw new System.NotImplementedException();
     }
 }

@@ -9,7 +9,8 @@ public class AvatarManager : MonoBehaviour
     public AvatarControllerType controllerType;
     private AvatarController controller;
 
-    public AvatarBody body;
+    [SerializeField]
+    private AvatarBody body;
 
     private void Start()
     {
@@ -21,5 +22,6 @@ public class AvatarManager : MonoBehaviour
         controller.Update();
     }
 
-    public AvatarRig Rig { get { return controller.Rig; } }
+    public AvatarRig ControllerRig { get { return controller.Rig; } }
+    public AvatarBody Body { get { return body; } }
 }

@@ -17,40 +17,47 @@ public class AvatarKeyboardController : AvatarController
 
     public override void Update()
     {
-        // Translate
-        if (Input.GetKey(KeyCode.D))
-        {
-            body.Translate(new Vector3(speed * Time.deltaTime, 0, 0));
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            body.Translate(new Vector3(-speed * Time.deltaTime, 0, 0));
-        }
-        if (Input.GetKey(KeyCode.E))
-        {
-            body.Translate(new Vector3(0, -speed * Time.deltaTime, 0));
-        }
-        if (Input.GetKey(KeyCode.Q))
-        {
-            body.Translate(new Vector3(0, speed * Time.deltaTime, 0));
-        }
-        if (Input.GetKey(KeyCode.W))
-        {
-            body.Translate(new Vector3(0, 0, speed * Time.deltaTime));
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            body.Translate(new Vector3(0, 0, -speed * Time.deltaTime));
-        }
+        base.Update();
 
-        // Rotate
-        if (Input.GetKey(KeyCode.RightArrow))
+        bool canvasDisabled = !GameObject.Find("Canvas").GetComponent<Canvas>().enabled;
+
+        if (canvasDisabled)
         {
-            body.Rotate(new Vector3(0, angularSpeed * Time.deltaTime, 0));
-        }
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            body.Rotate(new Vector3(0, -angularSpeed * Time.deltaTime, 0));
+            // Translate
+            if (Input.GetKey(KeyCode.D))
+            {
+                body.Translate(new Vector3(speed * Time.deltaTime, 0, 0));
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                body.Translate(new Vector3(-speed * Time.deltaTime, 0, 0));
+            }
+            if (Input.GetKey(KeyCode.E))
+            {
+                body.Translate(new Vector3(0, -speed * Time.deltaTime, 0));
+            }
+            if (Input.GetKey(KeyCode.Q))
+            {
+                body.Translate(new Vector3(0, speed * Time.deltaTime, 0));
+            }
+            if (Input.GetKey(KeyCode.W))
+            {
+                body.Translate(new Vector3(0, 0, speed * Time.deltaTime));
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                body.Translate(new Vector3(0, 0, -speed * Time.deltaTime));
+            }
+
+            // Rotate
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                body.Rotate(new Vector3(0, angularSpeed * Time.deltaTime, 0));
+            }
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                body.Rotate(new Vector3(0, -angularSpeed * Time.deltaTime, 0));
+            }
         }
     }
 }

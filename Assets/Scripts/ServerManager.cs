@@ -19,13 +19,13 @@ public class ServerManager : MonoBehaviour
     //private const int BUFF_SIZE = 8192;
     //private byte[] recvBuffer = new byte[BUFF_SIZE];
 
-    private int packetRate = 30;
+    private int packetRate = 60;
 
     private System.Object clientsLock = new System.Object();
     private List<ClientData> clients = new List<ClientData>();
 
     public List<Transform> spawnTransforms = new List<Transform>();
-    private List<Vector3> spawnPositions = new List<Vector3>();
+    private List<Trans> spawnTrans = new List<Trans>();
 
     public bool send = true;
 
@@ -35,7 +35,7 @@ public class ServerManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         // Get spawn positions from transforms
-        spawnPositions = spawnTransforms.Select(x => x.position).ToList();
+        spawnTrans = spawnTransforms.Select(x => new Trans(x.position, x.rotation)).ToList();
 
         // Start listening
         listener = new TcpListener(IPAddress.Any, Constants.PORT);
@@ -152,9 +152,9 @@ public class ServerManager : MonoBehaviour
                 // Begin sending data
                 SendServerPacket(BuildServerPacket(Packet.PacketType.Text, "Welcome\n"), socket);
 
-                Vector3 pos = spawnPositions[(clients.Count - 1) % spawnPositions.Count];
-                clients.Last().spawnPos = pos;
-                SendServerPacket(BuildServerPacket(Packet.PacketType.Spawn, pos), socket);
+                Trans spawn = spawnTrans[(clients.Count - 1) % spawnTrans.Count];
+                clients.Last().spawn = spawn;
+                SendServerPacket(BuildServerPacket(Packet.PacketType.Spawn, spawn), socket);
 
                 // Begin receiving data
                 socket.BeginReceive(client.recvBuffer, 0, client.recvBuffer.Length, SocketFlags.None,
@@ -225,12 +225,18 @@ public class ServerManager : MonoBehaviour
                 break;
 
             case Packet.PacketType.Spawn:
-                packet.AddRange(BitConverter.GetBytes((short)(2 + 1 + 3 * sizeof(float))));
+                packet.AddRange(BitConverter.GetBytes((short)(2 + 1 + 7 * sizeof(float))));
                 packet.Add((byte)Packet.PacketType.Spawn);
-                Vector3 pos = (Vector3)data;
-                packet.AddRange(BitConverter.GetBytes(pos.x));
-                packet.AddRange(BitConverter.GetBytes(pos.y));
-                packet.AddRange(BitConverter.GetBytes(pos.z));
+                Trans spawn = (Trans)data;
+
+                packet.AddRange(BitConverter.GetBytes(spawn.Pos.x));
+                packet.AddRange(BitConverter.GetBytes(spawn.Pos.y));
+                packet.AddRange(BitConverter.GetBytes(spawn.Pos.z));
+
+                packet.AddRange(BitConverter.GetBytes(spawn.Rot.x));
+                packet.AddRange(BitConverter.GetBytes(spawn.Rot.y));
+                packet.AddRange(BitConverter.GetBytes(spawn.Rot.z));
+                packet.AddRange(BitConverter.GetBytes(spawn.Rot.z));
                 break;
 
             case Packet.PacketType.OtherClients:
@@ -326,6 +332,18 @@ public class ServerManager : MonoBehaviour
                                 packetLength - 3);
                             dataIndex += data.Length;
                             Debug.Log("[C(" + client.socket.RemoteEndPoint + ")->S]: " + data + " (" + packetLength + " of " + size + " bytes)");
+
+                            // Echo received messages to all clients
+                            List<byte> reply = BuildServerPacket(Packet.PacketType.Text, data);
+                            lock (clientsLock)
+                            {
+                                foreach (ClientData c in clients)
+                                {
+                                    if (c.socket.Handle == client.socket.Handle)
+                                        continue;
+                                    SendServerPacket(reply, c.socket);
+                                }
+                            }
                         }
                         break;
 

@@ -16,16 +16,18 @@ public class AvatarVRController : AvatarController
 
     public override void Update()
     {
+        base.Update();
+
         // Rotate the body in the same direction as the Camera
         body.transform.rotation = Quaternion.Euler(new Vector3(0, rig.GetRigEye().eulerAngles.y, 0));
 
         if(rig.GetTransform(Constants.Hip).Key != null)
         {
-            body.transform.position += rig.GetRigEye().position - body.GetBodyEye().position;
+            //throw new System.NotImplementedException();
         }
         else
         {
-            //throw new System.NotImplementedException();
+            body.transform.position += rig.GetRigEye().position - body.GetBodyEye().position;
         }
 
         if(rig.GetTransform(Constants.RightFoot).Key != null)

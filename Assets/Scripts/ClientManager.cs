@@ -22,7 +22,7 @@ public class ClientManager : MonoBehaviour
     private const int BUFF_SIZE = 8192;
     private byte[] recvBuffer = new byte[BUFF_SIZE];
 
-    private int packetRate = 30;
+    private int packetRate = 60;
 
     public bool Reconnect = true;
     private bool connecting = true;
@@ -30,6 +30,7 @@ public class ClientManager : MonoBehaviour
     //private GameObject rig;
     private bool spawned = false;
     private Vector3 spawnPos;
+    private Trans spawn;
 
     public AvatarManager avatarManager;
 
@@ -38,6 +39,7 @@ public class ClientManager : MonoBehaviour
     private bool receivedNewText = false;
     private string recvText;
     private Text recvTextField;
+    private Text onlineTxt;
 
     private void Awake()
     {
@@ -48,6 +50,7 @@ public class ClientManager : MonoBehaviour
         Connect();
 
         recvTextField = GameObject.Find("RecvTxt").GetComponent<Text>();
+        onlineTxt = GameObject.Find("OnlineTxt").GetComponent<Text>();
     }
 
     private void Start()
@@ -78,7 +81,9 @@ public class ClientManager : MonoBehaviour
 
         if (spawned)
         {
-            avatarManager.body.transform.position = spawnPos;
+            // Move Body and Rig? to the position and rotation received
+            avatarManager.Body.transform.position = spawn.Pos;
+            avatarManager.Body.transform.rotation = spawn.Rot;
             spawned = false;
         }
 
@@ -90,9 +95,10 @@ public class ClientManager : MonoBehaviour
         for (int i = 0; i < oponents.Count; i++)
         {
             Oponent oponent = oponents.GetOponent(i);
-            if (oponent.TransCount > 1)
+            if (oponent.TransCount > 0)
             {
                 Trans t = oponent.GetTrans(0);
+                //Debug.Log(t.Id);
                 GameObject obj = GameObject.Find(oponent.Id + " - " + t.Id);
                 if (obj == null)
                 {
@@ -106,6 +112,7 @@ public class ClientManager : MonoBehaviour
                 for (int j = 1; j < oponent.TransCount; j++)
                 {
                     t = oponent.GetTrans(j);
+                    //Debug.Log(t.Id);
                     Transform child = obj.transform.Find(t.Id);
                     child.position = t.Pos;
                     child.rotation = t.Rot;
@@ -121,6 +128,17 @@ public class ClientManager : MonoBehaviour
         {
             recvTextField.text = "[" + DateTime.Now.ToString("hh:mm:ss") + "]: " + recvText;
             receivedNewText = false;
+        }
+
+        if (socket.Connected)
+        {
+            onlineTxt.text = "Online";
+            onlineTxt.color = Color.green;
+        }
+        else
+        {
+            onlineTxt.text = "Offline";
+            onlineTxt.color = Color.red;
         }
     }
 
@@ -213,7 +231,7 @@ public class ClientManager : MonoBehaviour
 
             // Sensor Data (Ref + 6 sensors)                
             case Packet.PacketType.Sensors:
-                int transformCount = avatarManager.Rig.GetTransformCount();
+                int transformCount = avatarManager.ControllerRig.GetTransformCount();
                 int packetSize = sizeof(short)  // 2 bytes: Length of the packet (in bytes)
                     + sizeof(byte)              // 1 byte:  Packet type
                     + sizeof(byte)              // 1 byte:  Transform Count (up to 255)
@@ -227,7 +245,7 @@ public class ClientManager : MonoBehaviour
                 //foreach (var transform in sendTransforms)
                 for(int i = 0; i < transformCount; i++)
                 {
-                    var t = avatarManager.Rig.GetTransform(i);
+                    var t = avatarManager.ControllerRig.GetTransform(i);
 
                     byte[] name = new byte[4];
                     //Debug.Assert(transform.name.Length <= 4, "The transform name is too long!");
@@ -300,9 +318,13 @@ public class ClientManager : MonoBehaviour
                         float x = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
                         float y = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
                         float z = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-                        spawnPos = new Vector3(x, y, z);
+                        float qx = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
+                        float qy = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
+                        float qz = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
+                        float qw = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
+                        spawn = new Trans(new Vector3(x, y, z), new Quaternion(qx, qy, qz, qw));
                         spawned = true;
-                        Debug.Log("[S->C]: Spawn Position = " + spawnPos + " (" + packetLength + " of " + size + " bytes)");
+                        Debug.Log("[S->C]: Spawn Position = " + spawn.Pos + " (" + packetLength + " of " + size + " bytes)");
                     }
                     break;
 

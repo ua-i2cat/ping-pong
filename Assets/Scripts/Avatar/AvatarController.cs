@@ -10,7 +10,7 @@ public abstract class AvatarController
         this.body = body;
     }
 
-    public virtual void Update() { }
+    public virtual void Update() { Rig.Update(); }
 
     public AvatarRig Rig { get { return rig; } }
 

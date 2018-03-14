@@ -16,7 +16,7 @@ public class CanvasManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.F1))
         {
             canvas.enabled = !canvas.enabled;
         }
