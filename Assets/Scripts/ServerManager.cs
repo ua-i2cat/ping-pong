@@ -15,7 +15,6 @@ using UnityEngine.UI;
 public class ServerManager : MonoBehaviour
 {
     private TcpListener listener;
-    private int port = 33333;
 
     //private const int BUFF_SIZE = 8192;
     //private byte[] recvBuffer = new byte[BUFF_SIZE];
@@ -39,12 +38,12 @@ public class ServerManager : MonoBehaviour
         spawnPositions = spawnTransforms.Select(x => x.position).ToList();
 
         // Start listening
-        listener = new TcpListener(IPAddress.Any, port);
+        listener = new TcpListener(IPAddress.Any, Constants.PORT);
         listener.Start(/*MAX_PENDING_CONNECTIONS*/);
 
         // Start accepting connections
         listener.BeginAcceptSocket(new AsyncCallback(AcceptCallback), null);
-        Debug.Log("Server listening on port " + port);
+        Debug.Log("Server listening on port " + Constants.PORT);
     }
 
     private void Update()
@@ -75,7 +74,7 @@ public class ServerManager : MonoBehaviour
                     foreach (var key in client.TransformKeys)
                     {
                         GameObject obj;
-                        if (key.Contains("RH"))
+                        if (key.Contains(/*Constants.RightHand*/"TODO"))
                         {
                             obj = Instantiate(Resources.Load("RH")) as GameObject;
                         }
