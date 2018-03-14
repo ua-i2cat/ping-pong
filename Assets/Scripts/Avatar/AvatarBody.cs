@@ -16,7 +16,7 @@ public class AvatarBody : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    public Transform GetEyeTransform()
+    public Transform GetBodyEye()
     {
         return transform.Find("Eye");
     }

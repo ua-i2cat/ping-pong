@@ -51,7 +51,7 @@ public class ServerManager : MonoBehaviour
     {
         RemoveDisconnectedClients();
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log(clients.Count);
             foreach (var client in clients)

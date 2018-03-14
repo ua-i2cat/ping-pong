@@ -2,33 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AvatarRig
+public abstract class AvatarRig
 {
     //private Transform Root;
-    //private Transform Head;
-    //private Transform LH;
-    //private Transform RH;
-    //private Transform Hip;
+    protected Transform Eye;
+    protected Transform LH;
+    protected Transform RH;
+    protected Transform Hip;
     //private Transform LF;
     //private Transform RF;
 
-    public AvatarRig(AvatarBody body)
+    public Transform GetRigEye()
     {
-        // NO VR
-        //GameObject cam = GameObject.FindGameObjectWithTag("MainCamera");
-        //Debug.Assert(cam != null && cam.transform.parent == null && !UnityEngine.XR.XRSettings.enabled,
-        //    "Incompatible camera configuration!");
-        //cam.transform.position = body.GetEyeTransform().position;
-        //cam.transform.rotation = body.GetEyeTransform().rotation;
-        //cam.transform.parent = body.transform;
+        return Eye;
+    }
 
-        // VR
-        GameObject camRig = GameObject.Find("[CameraRig]");
-        Debug.Log("Rig: " + camRig.transform.position);
-        Transform eye = camRig.transform.Find("Camera (eye)");
-        Debug.Log("Eye: " + eye.position);
+    public KeyValuePair<bool, Transform> GetHip()
+    {
+        return new KeyValuePair<bool, Transform>(Hip != null, Hip);
+    }
+    public KeyValuePair<bool, Transform> GetLH()
+    {
+        return new KeyValuePair<bool, Transform>(LH != null, LH);
+    }
+    public KeyValuePair<bool, Transform> GetRH()
+    {
+        return new KeyValuePair<bool, Transform>(RH != null, RH);
+    }
+}
 
-        body.transform.rotation = Quaternion.Euler(new Vector3(0, eye.eulerAngles.y, 0));
-        camRig.transform.position += body.GetEyeTransform().position - eye.position;
+public class AvatarRigVR : AvatarRig
+{
+    public AvatarRigVR(AvatarBody body)
+    {
+        GameObject rig = GameObject.Find("[CameraRig]");
+
+        Eye = rig.transform.Find("Camera (eye)");
+        LH = rig.transform.Find("Controller (left)").Find("attach");
+        RH = rig.transform.Find("Controller (right)").Find("attach");
+
+        // Move the rig so that it matches the INITIAL position of the body
+        rig.transform.position += body.GetBodyEye().position - GetRigEye().position;
+    }
+}
+
+public class AvatarRigCam : AvatarRig
+{
+    public AvatarRigCam(AvatarBody body)
+    {
+        GameObject cam = GameObject.FindGameObjectWithTag("MainCamera");
+        Debug.Assert(cam != null && !UnityEngine.XR.XRSettings.enabled,
+            "Incompatible camera configuration!");
+
+        Eye = cam.transform;
+
+        cam.transform.position = body.GetBodyEye().position;
+        cam.transform.rotation = body.GetBodyEye().rotation;
+        cam.transform.parent = body.transform;
     }
 }

@@ -12,7 +12,7 @@ public class AvatarKeyboardController : AvatarController
 
     public AvatarKeyboardController(AvatarBody body) : base(body)
     {
-        rig = new AvatarRig(body);
+        rig = new AvatarRigCam(body);
     }
 
     public override void Update()
