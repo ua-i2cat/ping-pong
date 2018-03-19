@@ -2,7 +2,10 @@
 // See the LICENSE file in the project root for more information.
 // Author: alexandre.via@i2cat.net
 
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using UnityEngine;
 
 public class Trans
@@ -44,5 +47,31 @@ public class Trans
             size += Marshal.SizeOf(typeof(Quaternion));
             return size;
         }
+    }
+
+    public List<byte> Serialize()
+    {
+        List<byte> data = new List<byte>();
+
+        byte[] name = new byte[4];
+        Encoding.ASCII.GetBytes(id, 0, id.Length, name, 0);
+        data.AddRange(name);
+        //data.AddRange(Encoding.ASCII.GetBytes(id));
+
+        data.AddRange(BitConverter.GetBytes(Pos.x));
+        data.AddRange(BitConverter.GetBytes(Pos.y));
+        data.AddRange(BitConverter.GetBytes(Pos.z));
+
+        data.AddRange(BitConverter.GetBytes(Rot.x));
+        data.AddRange(BitConverter.GetBytes(Rot.y));
+        data.AddRange(BitConverter.GetBytes(Rot.z));
+        data.AddRange(BitConverter.GetBytes(Rot.w));
+
+        return data;
+    }
+
+    public static Trans Deserialize(List<byte> data)
+    {
+        throw new NotImplementedException();
     }
 }

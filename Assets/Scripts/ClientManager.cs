@@ -160,8 +160,6 @@ public class ClientManager : MonoBehaviour
             socket.SendBufferSize = BUFF_SIZE;
             Debug.Log("Connection established");
 
-            // Begin sending data
-
             // Begin receiving data
             socket.BeginReceive(recvBuffer, 0, recvBuffer.Length, SocketFlags.None,
                 ReceiveCallback, null);

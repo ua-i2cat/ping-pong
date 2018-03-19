@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using UnityEngine;
@@ -34,7 +35,7 @@ public class ServerManager : MonoBehaviour
         // Fix the target framerate for standalone platforms
         Application.targetFrameRate = 60;
 
-        // Get spawn positions from transforms
+        // Get spawn transforms so that we can access them from another thread
         spawnTrans = spawnTransforms.Select(x => new Trans(x.position, x.rotation)).ToList();
 
         // Start listening
@@ -48,15 +49,16 @@ public class ServerManager : MonoBehaviour
 
     private void Update()
     {
+        // Check for disconnected clients
         RemoveDisconnectedClients();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log(clients.Count);
+            Debug.Log(clients.Count + " clients online");
             foreach (var client in clients)
             {
                 Debug.Log(client.socket.RemoteEndPoint.ToString());
-                Debug.Log(client.TransformCount);
+                Debug.Log(client.TransformCount + " transforms");
                 foreach (var key in client.TransformKeys)
                 {
                     Debug.Log("Key: " + key + " Id: " + client.GetTransform(key).Id);
@@ -111,8 +113,6 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
-
-        //send = false;
     }
 
     private void OnApplicationQuit()
