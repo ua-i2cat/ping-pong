@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ClientInfo
 {
-    private int id;
+    private int id = 0;
     private List<Trans> transforms = new List<Trans>();
 
     public List<byte> Serialize()

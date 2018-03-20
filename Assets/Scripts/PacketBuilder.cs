@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -15,7 +16,16 @@ public static class PacketBuilder
         content.AddRange(GetPacketData(type, data));    // X bytes for the data
 
         Packet packet = new Packet(content);
+        return packet;
+    }
 
+    public static Packet Parse(byte[] data, ref int dataIndex)
+    {
+        int size = BitConverter.ToInt16(data, dataIndex);
+        List<byte> content = data.ToList().GetRange(dataIndex, size);
+        dataIndex += size;
+
+        Packet packet = new Packet(content);
         return packet;
     }
 
@@ -37,7 +47,6 @@ public static class PacketBuilder
                 break;
 
             case Packet.PacketType.Spawn:
-                Trans spawn = (Trans)data;
                 size += Trans.Size;
                 break;
 
@@ -45,7 +54,7 @@ public static class PacketBuilder
                 List<ClientData> clients = (List<ClientData>)data;
                 size += 1; // Number of clients (0-255)
                 foreach (var client in clients)
-                    size += client.TransformCount * Trans.Size;
+                    size += sizeof(int) + sizeof(byte) + client.TransformCount * Trans.Size;
                 break;
 
             default:
@@ -80,7 +89,7 @@ public static class PacketBuilder
                 break;
 
             case Packet.PacketType.OtherClients:
-                List<ClientInfo> clients = (List<ClientInfo>)data;
+                List<ClientData> clients = (List<ClientData>)data;
                 content.Add((byte)clients.Count);
                 foreach (var client in clients)
                     content.AddRange(client.Serialize());
@@ -90,6 +99,6 @@ public static class PacketBuilder
                 throw new ArgumentException("Invalid PacketType!");
         }
 
-        return null;
+        return content;
     }
 }

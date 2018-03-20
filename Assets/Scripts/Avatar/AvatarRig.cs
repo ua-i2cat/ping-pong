@@ -31,6 +31,17 @@ public abstract class AvatarRig
     }
 
     public abstract void Update();
+
+    public List<Trans> GetTransforms()
+    {
+        List<Trans> t = new List<Trans>();
+        for(int i = 0; i < this.GetTransformCount(); i++)
+        {
+            var pair = this.GetTransform(i);
+            t.Add(new Trans(pair.Value.position, pair.Value.rotation, pair.Key));
+        }
+        return t;
+    }
 }
 
 public class AvatarRigVR : AvatarRig

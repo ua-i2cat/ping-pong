@@ -16,10 +16,6 @@ using UnityEngine.UI;
 public class ServerManager : MonoBehaviour
 {
     private TcpListener listener;
-
-    //private const int BUFF_SIZE = 8192;
-    //private byte[] recvBuffer = new byte[BUFF_SIZE];
-
     private int packetRate = 60;
 
     private System.Object clientsLock = new System.Object();
@@ -27,8 +23,6 @@ public class ServerManager : MonoBehaviour
 
     public List<Transform> spawnTransforms = new List<Transform>();
     private List<Trans> spawnTrans = new List<Trans>();
-
-    public bool send = true;
 
     private void Awake()
     {
@@ -49,9 +43,13 @@ public class ServerManager : MonoBehaviour
 
     private void Update()
     {
-        // Check for disconnected clients
+        HandleInput();
         RemoveDisconnectedClients();
+        ProcessClients();
+    }
 
+    private void HandleInput()
+    {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log(clients.Count + " clients online");
@@ -65,11 +63,30 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
+    }
 
+    private void OnApplicationQuit()
+    {
+        Debug.Log("Stopping the server...");
+
+        // Close active connections
+        lock (clientsLock)
+        {
+            foreach (ClientData client in clients)
+                client.socket.Close();
+        }
+
+        // Stop listening for client connections
+        listener.Stop();
+    }
+
+    private void ProcessClients()
+    {
         lock (clientsLock)
         {
             foreach (var client in clients)
             {
+                // Instantiate if a client is connected and doesn't have an instance already
                 if (client.instance == null && client.TransformCount > 0)
                 {
                     client.instance = new GameObject(client.socket.RemoteEndPoint.ToString());
@@ -92,6 +109,7 @@ public class ServerManager : MonoBehaviour
                         obj.transform.rotation = t.Rot;
                     }
                 }
+                // Update already instanced clients
                 else if (client.instance != null && client.TransformCount > 0)
                 {
                     foreach (var key in client.TransformKeys)
@@ -107,29 +125,31 @@ public class ServerManager : MonoBehaviour
                 }
 
                 // Share transforms between Clients
-                if (clients.Count >= 1 && send)
+                if (clients.Count >= 1)
                 {
-                    SendServerPacket(BuildServerPacket(Packet.PacketType.OtherClients, client), client.socket);
+                    var others = clients.Where(x => x.socket.Handle != client.socket.Handle
+                        && x.TransformCount > 0 && x.instance != null).ToList();
+                    Packet packet = PacketBuilder.Build(Packet.PacketType.OtherClients, others);
+                    packet.Send(client.socket, new AsyncCallback(SendCallback));
                 }
             }
         }
     }
 
-    private void OnApplicationQuit()
+    private void RemoveDisconnectedClients()
     {
-        Debug.Log("Stopping the server...");
-
-        // Close active connections
         lock (clientsLock)
         {
-            foreach (ClientData client in clients)
-                client.socket.Close();
+            for (int i = clients.Count - 1; i >= 0; i--)
+            {
+                if (!clients[i].socket.Connected)
+                {
+                    Destroy(clients[i].instance);
+                    clients.Remove(clients[i]);
+                }
+            }
         }
-
-        // Stop listening for client connections
-        listener.Stop();
     }
-
 
     #region Callbacks
     // Triggered when accepting an incoming connection
@@ -150,11 +170,14 @@ public class ServerManager : MonoBehaviour
                 clients.Add(client);
 
                 // Begin sending data
-                SendServerPacket(BuildServerPacket(Packet.PacketType.Text, "Welcome\n"), socket);
+                Packet packet = PacketBuilder.Build(Packet.PacketType.Text, "Welcome\n");
+                packet.Send(socket, new AsyncCallback(SendCallback));
 
                 Trans spawn = spawnTrans[(clients.Count - 1) % spawnTrans.Count];
                 clients.Last().spawn = spawn;
-                SendServerPacket(BuildServerPacket(Packet.PacketType.Spawn, spawn), socket);
+
+                packet = PacketBuilder.Build(Packet.PacketType.Spawn, spawn);
+                packet.Send(socket, new AsyncCallback(SendCallback));
 
                 // Begin receiving data
                 socket.BeginReceive(client.recvBuffer, 0, client.recvBuffer.Length, SocketFlags.None,
@@ -173,11 +196,19 @@ public class ServerManager : MonoBehaviour
     // Triggered when sending a packet
     private void SendCallback(IAsyncResult AR)
     {
-        Socket socket = (Socket)AR.AsyncState;
-        //int bytes_sent = socket.EndSend(AR);
-        //Debug.Log(bytes_sent + " bytes sent");
+        try
+        {
+            Socket socket = (Socket)AR.AsyncState;
+            /*int bytes_sent = */
+            socket.EndSend(AR);
+            //Debug.Log(bytes_sent + " bytes sent");
 
-        Thread.Sleep(1000 / packetRate);
+            Thread.Sleep(1000 / packetRate);
+        }
+        catch
+        {
+            Debug.LogWarning("Could not send the packet");
+        }
     }
 
     // Triggered when a packet is received
@@ -203,104 +234,8 @@ public class ServerManager : MonoBehaviour
     }
     #endregion
 
-    private List<byte> BuildServerPacket(Packet.PacketType type, object data)
-    {
-        List<byte> packet = new List<byte>();
-
-        switch (type)
-        {
-            // Plain Text
-            case Packet.PacketType.Text:
-                string text = (string)data;
-                packet.AddRange(BitConverter.GetBytes((short)(2 + 1 + text.Length)));
-                packet.Add((byte)Packet.PacketType.Text);
-                packet.AddRange(Encoding.ASCII.GetBytes(text));
-                break;
-
-            // Sensor Data (6)
-            case Packet.PacketType.Sensors:
-                packet.AddRange(BitConverter.GetBytes((short)(2 + 1)));
-                //packet.AddRange(BitConverter.GetBytes((short)(2 + 6 * 7 * sizeof(float))));
-                packet.Add((byte)Packet.PacketType.Sensors);
-                break;
-
-            case Packet.PacketType.Spawn:
-                packet.AddRange(BitConverter.GetBytes((short)(2 + 1 + 7 * sizeof(float))));
-                packet.Add((byte)Packet.PacketType.Spawn);
-                Trans spawn = (Trans)data;
-
-                packet.AddRange(BitConverter.GetBytes(spawn.Pos.x));
-                packet.AddRange(BitConverter.GetBytes(spawn.Pos.y));
-                packet.AddRange(BitConverter.GetBytes(spawn.Pos.z));
-
-                packet.AddRange(BitConverter.GetBytes(spawn.Rot.x));
-                packet.AddRange(BitConverter.GetBytes(spawn.Rot.y));
-                packet.AddRange(BitConverter.GetBytes(spawn.Rot.z));
-                packet.AddRange(BitConverter.GetBytes(spawn.Rot.z));
-                break;
-
-            case Packet.PacketType.OtherClients:
-                lock (clientsLock)
-                {
-                    ClientData client = (ClientData)data;
-                    int packetSize = sizeof(short)  // 2 bytes: Length of the packet (in bytes)
-                        + sizeof(byte)              // 1 byte:  Packet type
-                        + sizeof(byte);             // 1 byte:  #Clients - 1 (up to 255)
-                    var otherClients = clients.Where(x => x.socket.Handle != client.socket.Handle
-                        && x.TransformCount > 0);
-                    foreach (var c in otherClients)
-                    {               // ClientID  +  #transforms
-                        packetSize += sizeof(int) + sizeof(byte) + c.TransformCount * Trans.Size;
-                    }
-                    if (otherClients.Count() > 0)
-                    {
-                        //Debug.Assert(packetSize == 233, "PacketSize: " + packetSize +
-                        //    " otherClients.Count: " + otherClients.Count() + " " + 
-                        //    otherClients.First<ClientData>().TransformCount);
-                    }
-                    packet.AddRange(BitConverter.GetBytes((short)packetSize));
-                    packet.Add((byte)Packet.PacketType.OtherClients);
-                    packet.Add((byte)(clients.Count - 1));
-
-                    foreach (var c in otherClients)
-                    {
-                        if (c.instance == null)
-                            return new List<byte>();
-
-                        packet.AddRange(BitConverter.GetBytes(c.socket.GetHashCode())); // ClientID
-                        packet.Add((byte)c.instance.transform.childCount);              // #Transforms
-                        foreach (Transform t in c.instance.transform)
-                        {
-                            byte[] name = new byte[4];
-                            Debug.Assert(t.name.Length <= 4, "The transform name is too long! ");
-                            Encoding.ASCII.GetBytes(t.name, 0, t.name.Length, name, 0);
-                            packet.AddRange(name);
-                            //packet.AddRange(BitConverter.GetBytes(t.GetHashCode()));
-
-                            packet.AddRange(BitConverter.GetBytes(t.position.x));
-                            packet.AddRange(BitConverter.GetBytes(t.position.y));
-                            packet.AddRange(BitConverter.GetBytes(t.position.z));
-
-                            packet.AddRange(BitConverter.GetBytes(t.rotation.x));
-                            packet.AddRange(BitConverter.GetBytes(t.rotation.y));
-                            packet.AddRange(BitConverter.GetBytes(t.rotation.z));
-                            packet.AddRange(BitConverter.GetBytes(t.rotation.w));
-                        }
-                    }
-                }
-                //Debug.Log(packetSize + " " + packet.Count);
-                break;
-
-            // Invalid Type
-            default:
-                throw new InvalidOperationException("Invalid packet type");
-        }
-
-        return packet;
-    }
-
     // Discard invalid packets, and process the valid ones
-    private bool HandleClientPacket(ClientData client, byte[] packet, int size)
+    private bool HandleClientPacket(ClientData client, byte[] data, int size)
     {
         lock (clientsLock)
         {
@@ -310,73 +245,37 @@ public class ServerManager : MonoBehaviour
                 return false;
             }
 
+            // The data received can contain more than one packet!
             int dataIndex = 0;
             while (dataIndex < size)
             {
-                int packetLength = BitConverter.ToInt16(packet, dataIndex);
-                dataIndex += sizeof(Int16);
-                if (packetLength > size)
-                {
-                    Debug.Log("Invalid packet received. PacketLength: " + packetLength + " Received: " + size + " bytes");
-                    return false;
-                }
+                // Parse a packet from the data buffer
+                Packet packet = PacketBuilder.Parse(data, ref dataIndex);
 
-                Packet.PacketType type = (Packet.PacketType)packet[dataIndex];
-                dataIndex += sizeof(byte);
-
-                switch (type)
+                // Process the packet
+                switch(packet.Type)
                 {
                     case Packet.PacketType.Text:
+                        string text = ((PacketText)packet).Data;
+                        Debug.Log("[C(" + client.socket.RemoteEndPoint + ")->S]: " + text
+                            + " (" + packet.Size + " of " + size + " bytes)");
+                        foreach (var c in clients)
                         {
-                            string data = Encoding.ASCII.GetString(packet, dataIndex,
-                                packetLength - 3);
-                            dataIndex += data.Length;
-                            Debug.Log("[C(" + client.socket.RemoteEndPoint + ")->S]: " + data + " (" + packetLength + " of " + size + " bytes)");
-
-                            // Echo received messages to all clients
-                            List<byte> reply = BuildServerPacket(Packet.PacketType.Text, data);
-                            lock (clientsLock)
-                            {
-                                foreach (ClientData c in clients)
-                                {
-                                    if (c.socket.Handle == client.socket.Handle)
-                                        continue;
-                                    SendServerPacket(reply, c.socket);
-                                }
-                            }
+                            if (c.socket.Handle == client.socket.Handle)
+                                continue;
+                            packet.Send(c.socket, new AsyncCallback(SendCallback));
                         }
                         break;
 
                     case Packet.PacketType.Sensors:
-                        {
-                            int transformCount = packet[dataIndex++];
-                            for (int i = 0; i < transformCount; i++)
-                            {
-                                string tName = Encoding.ASCII.GetString(packet, dataIndex, 4); dataIndex += 4;
-                                //int hashCode = BitConverter.ToInt32(packet, dataIndex); dataIndex += 4;
-
-                                float x = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-                                float y = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-                                float z = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-
-                                float qx = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-                                float qy = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-                                float qz = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-                                float qw = BitConverter.ToSingle(packet, dataIndex); dataIndex += 4;
-
-                                Vector3 pos = new Vector3(x, y, z);
-                                Quaternion rot = new Quaternion(qx, qy, qz, qw);
-                                client.SetTransform(tName, new Trans(pos, rot, tName));
-                                //client.SetTransform(hashCode.ToString(), new Trans(pos, rot, hashCode));
-                            }
-                            //if (size % packetLength != 0)
-                            //    Debug.Log("[C(" + client.socket.RemoteEndPoint + ")->S]: " + type + " (" + packetLength + " of " + size + " bytes)");
-                        }
+                        List<Trans> transforms = ((PacketSensors)packet).Data;
+                        foreach(Trans t in transforms)
+                            client.SetTransform(t.Id, t);
                         break;
 
                     default:
                         Debug.Assert(false);
-                        Debug.Log("Invalid PacketType" + " (" + packetLength + " of " + size + " bytes)");
+                        Debug.LogError("Invalid PacketType" + " (" + packet.Size + " of " + size + " bytes)");
                         break;
                 }
             }
@@ -385,69 +284,19 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    // Send a packet to the specified client
-    private void SendServerPacket(List<byte> packet, Socket clientSocket)
-    {
-        if (!clientSocket.Connected || packet.Count == 0)
-            return;
-
-        short packetLen = BitConverter.ToInt16(packet.ToArray(), 0);
-        Debug.Assert(packetLen == packet.Count, "packetLen: " + packetLen + " packet.Count: " + packet.Count + " Type: " + (Packet.PacketType)packet[2]);
-        Packet.PacketType type = (Packet.PacketType)packet[2];
-
-        object content = null;
-        switch (type)
-        {
-            case Packet.PacketType.Text:
-                content = Encoding.ASCII.GetString(packet.ToArray(), 3, packet.Count - 3);
-                break;
-
-            case Packet.PacketType.Spawn:
-                float x = BitConverter.ToSingle(packet.ToArray(), 3 + 0);
-                float y = BitConverter.ToSingle(packet.ToArray(), 3 + 4);
-                float z = BitConverter.ToSingle(packet.ToArray(), 3 + 8);
-                content = new Vector3(x, y, z);
-                break;
-        }
-
-        if (type != Packet.PacketType.OtherClients)
-        {
-            Debug.Log("[S->C(" + clientSocket.RemoteEndPoint + ")]: " + type + ": " + content
-                + " (" + packet.Count + " bytes)");
-        }
-
-        clientSocket.BeginSend(packet.ToArray(), 0, packet.Count, SocketFlags.None,
-                new AsyncCallback(SendCallback), clientSocket);
-    }
-
-    private void RemoveDisconnectedClients()
-    {
-        lock (clientsLock)
-        {
-            for (int i = clients.Count - 1; i >= 0; i--)
-            {
-                if (!clients[i].socket.Connected)
-                {
-                    Destroy(clients[i].instance);
-                    clients.Remove(clients[i]);
-                }
-            }
-        }
-    }
-
     public void OnSendBtn_Click()
     {
         // Get text in the input field and build a packet with it
         GameObject sendText = GameObject.Find("SendInputField");
         string text = sendText.GetComponent<InputField>().text;
-        List<byte> packet = BuildServerPacket(Packet.PacketType.Text, text);
+        Packet packet = PacketBuilder.Build(Packet.PacketType.Text, text);
 
         // Send the packet to all the connected clients
         lock (clientsLock)
         {
             foreach (ClientData client in clients)
             {
-                SendServerPacket(packet, client.socket);
+                packet.Send(client.socket, new AsyncCallback(SendCallback));
             }
         }
     }

@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 // Author: alexandre.via@i2cat.net
 
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
@@ -68,5 +69,21 @@ public class ClientData
                 return keys;
             }
         }
+    }
+
+    public List<byte> Serialize()
+    {
+        List<byte> data = new List<byte>();
+        data.AddRange(BitConverter.GetBytes(socket.GetHashCode())); // Client id
+        data.Add((byte)transforms.Count);                           // Transform Count
+        if (instance == null)
+        {
+            Debug.LogWarning("Null instance in Serialize");
+            return new List<byte>();
+        }
+        foreach (Transform t in instance.transform /*transforms*/)
+            //data.AddRange(t.Value.Serialize());
+            data.AddRange(new Trans(t.position, t.rotation, t.name).Serialize());
+        return data;
     }
 }

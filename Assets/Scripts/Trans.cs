@@ -42,7 +42,7 @@ public class Trans
     {
         get
         {
-            int size = 4 * sizeof(byte);
+            int size = 4;
             size += Marshal.SizeOf(typeof(Vector3));
             size += Marshal.SizeOf(typeof(Quaternion));
             return size;
