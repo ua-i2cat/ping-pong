@@ -32,6 +32,7 @@ public class AvatarBody : MonoBehaviour
 
     public void SetIKAction(Action<Animator> onIKAction)
     {
+        Debug.Log("Setting IK Action");
         this.onIKAction = onIKAction;
     }
     private void OnAnimatorIK(int layerIndex)

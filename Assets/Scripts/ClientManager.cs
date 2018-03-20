@@ -110,7 +110,14 @@ public class ClientManager : MonoBehaviour
                     //var o = Instantiate(Resources.Load("AvatarManagerNet")) as GameObject;
                     //o.transform.parent = this.transform;
 
-                    obj = Instantiate(Resources.Load("RigBody")) as GameObject;
+                    // Body controlled by keyboard
+                    if(oponent.TransCount == 1)
+                        obj = Instantiate(Resources.Load("RigBody")) as GameObject;
+
+                    // Body controlled by IK
+                    if(oponent.TransCount > 1)
+                        obj = Instantiate(Resources.Load("IKBody")) as GameObject;
+
                     obj.transform.parent = this.transform;
                     obj.name = "Client (" + oponent.Id + ")";
                 }

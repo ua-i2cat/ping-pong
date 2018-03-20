@@ -30,7 +30,7 @@ public class IKController : MonoBehaviour
             rootToHead = hmdOffset.position - transform.position;
         }
 
-        transform.position = Head.position - rootToHead;
+        //transform.position = Head.position - rootToHead;
         transform.rotation = Quaternion.Euler(0, Head.rotation.eulerAngles.y, 0);
     }
 

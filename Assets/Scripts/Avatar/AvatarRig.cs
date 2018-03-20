@@ -51,6 +51,8 @@ public class AvatarRigVR : AvatarRig
 
     public AvatarRigVR(AvatarBody body)
     {
+        Debug.Log("AvatarRigVR constructor");
+
         try
         {
             rig = GameObject.Find("[CameraRig]").transform;
@@ -78,6 +80,7 @@ public class AvatarRigVR : AvatarRig
     }
 }
 
+// Rig used with a regular camera. No CameraRig!!
 public class AvatarRigCam : AvatarRig
 {
     private Transform rig;
@@ -85,6 +88,7 @@ public class AvatarRigCam : AvatarRig
 
     public AvatarRigCam(AvatarBody body)
     {
+        Debug.Log("AvatarRigCam constructor");
         rig = GameObject.FindGameObjectWithTag("MainCamera").transform;
         bodyEye = body.GetBodyEye();
         Debug.Assert(rig != null && !UnityEngine.XR.XRSettings.enabled,
@@ -109,8 +113,11 @@ public class AvatarRigNet : AvatarRig
     private Transform rig;
     private Transform bodyEye;
 
-    public AvatarRigNet(AvatarBody body)
+    public AvatarRigNet(AvatarBody body, string name)
     {
+        Debug.Log("AvatarRigNet constructor");
+        rig = GameObject.Find(name).transform;
+        bodyEye = body.GetBodyEye();
     }
 
     public override void Update()

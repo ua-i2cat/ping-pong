@@ -9,7 +9,7 @@ class AvatarControllerFactory
         switch(type)
         {
             case AvatarControllerType.Network:
-                return new AvatarNetworkController(body);
+                return new AvatarNetworkController(body, "");
 
             case AvatarControllerType.VR:
                 return new AvatarVRController(body);

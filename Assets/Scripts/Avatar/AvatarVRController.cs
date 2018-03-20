@@ -10,10 +10,12 @@ public class AvatarVRController : AvatarController
 {
     public AvatarVRController(AvatarBody body) : base(body)
     {
+        Debug.Log("AvatarVRController constructor");
         rig = new AvatarRigVR(body);
         body.SetIKAction(OnIKAction);
     }
 
+    // Move the body to follow the Rig
     public override void Update()
     {
         base.Update();

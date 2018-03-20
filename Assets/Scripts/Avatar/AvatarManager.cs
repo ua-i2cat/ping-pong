@@ -14,6 +14,7 @@ public class AvatarManager : MonoBehaviour
 
     private void Start()
     {
+        // Create AvatarController from the controllerType
         controller = AvatarControllerFactory.Create(controllerType, body);
     }
 

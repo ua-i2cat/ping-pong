@@ -12,6 +12,7 @@ public class AvatarKeyboardController : AvatarController
 
     public AvatarKeyboardController(AvatarBody body) : base(body)
     {
+        Debug.Log("AvatarKeyboardController constructor");
         rig = new AvatarRigCam(body);
     }
 
