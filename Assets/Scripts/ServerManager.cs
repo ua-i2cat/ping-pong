@@ -196,9 +196,9 @@ public class ServerManager : MonoBehaviour
     // Triggered when sending a packet
     private void SendCallback(IAsyncResult AR)
     {
+        Socket socket = (Socket)AR.AsyncState;
         try
-        {
-            Socket socket = (Socket)AR.AsyncState;
+        { 
             /*int bytes_sent = */
             socket.EndSend(AR);
             //Debug.Log(bytes_sent + " bytes sent");
@@ -207,7 +207,7 @@ public class ServerManager : MonoBehaviour
         }
         catch
         {
-            Debug.LogWarning("Could not send the packet");
+            Debug.Log("Client has disconnected " + socket.RemoteEndPoint);
         }
     }
 

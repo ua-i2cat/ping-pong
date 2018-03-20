@@ -103,20 +103,27 @@ public class ClientManager : MonoBehaviour
             if (oponent.TransCount > 0)
             {
                 Trans t = oponent.GetTrans(0);
-                GameObject obj = GameObject.Find(oponent.Id + " - " + t.Id);
+                //GameObject obj = GameObject.Find(oponent.Id + " - " + t.Id);
+                GameObject obj = GameObject.Find("Client (" + oponent.Id + ")");
                 if (obj == null)
                 {
-                    //obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    obj = Instantiate(Resources.Load("Rig")) as GameObject;
-                    obj.name = oponent.Id + " - " + t.Id;
-                }
-                obj.transform.position = t.Pos;
-                obj.transform.rotation = t.Rot;
+                    //var o = Instantiate(Resources.Load("AvatarManagerNet")) as GameObject;
+                    //o.transform.parent = this.transform;
 
-                for (int j = 1; j < oponent.TransCount; j++)
+                    obj = Instantiate(Resources.Load("RigBody")) as GameObject;
+                    obj.transform.parent = this.transform;
+                    obj.name = "Client (" + oponent.Id + ")";
+                }
+
+                for (int j = 0; j < oponent.TransCount; j++)
                 {
                     t = oponent.GetTrans(j);
                     Transform child = obj.transform.Find(t.Id);
+                    if (child == null)
+                    {
+                        Debug.Log(t.Id);
+                        continue;
+                    }
                     child.position = t.Pos;
                     child.rotation = t.Rot;
                 }

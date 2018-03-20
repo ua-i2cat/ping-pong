@@ -7,11 +7,11 @@ public class AvatarNetworkController : AvatarController
 {
     public AvatarNetworkController(AvatarBody body) : base(body)
     {
+        rig = new AvatarRigNet(body);
     }
 
     public override void Update()
     {
         base.Update();
-        throw new System.NotImplementedException();
     }
 }

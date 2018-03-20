@@ -103,3 +103,17 @@ public class AvatarRigCam : AvatarRig
         rig.rotation = bodyEye.rotation;
     }
 }
+
+public class AvatarRigNet : AvatarRig
+{
+    private Transform rig;
+    private Transform bodyEye;
+
+    public AvatarRigNet(AvatarBody body)
+    {
+    }
+
+    public override void Update()
+    {
+    }
+}
