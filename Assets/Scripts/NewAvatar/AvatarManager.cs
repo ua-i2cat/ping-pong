@@ -11,10 +11,11 @@ namespace avatar
         public AvatarBody body;
         public AvatarController controller;
         public AvatarControllerType type;
+        public bool isClient;
 
         private void Start()
         {
-            controller = AvatarFactory.Create(type, body);
+            controller = AvatarFactory.Create(type, body, isClient);
         }
 
         private void Update()

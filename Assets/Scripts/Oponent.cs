@@ -27,6 +27,18 @@ public class Oponents
         }
     }
 
+    public void RemoveOponent(int id)
+    {
+        lock(listLock)
+        {
+            Oponent o = oponents.FirstOrDefault<Oponent>(x => x.Id == id);
+            if(o != null)
+            {
+                oponents.Remove(o);
+            }
+        }
+    }
+
     public int Count
     {
         get { lock (listLock) { return oponents.Count; } }

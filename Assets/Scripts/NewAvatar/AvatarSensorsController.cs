@@ -11,10 +11,13 @@ namespace avatar
     {
         private Dictionary<string, Transform> transformsMap = new Dictionary<string, Transform>();
 
-        public AvatarSensorsController(AvatarBody body)
+        private bool isClient;
+
+        public AvatarSensorsController(AvatarBody body, bool isClient)
         {
             this.type = AvatarControllerType.SENSORS;
             this.body = body;
+            this.isClient = isClient;
 
             // Move the rig to match the eye of the body
         }
@@ -41,7 +44,7 @@ namespace avatar
 
         public override void Update()
         {
-            if(!initialized)
+            if(!initialized && isClient)
                 initialized = LazyInit();
         }
 

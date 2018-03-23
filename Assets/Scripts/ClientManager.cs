@@ -118,7 +118,7 @@ public class ClientManager : MonoBehaviour
 
                     // Body controlled by IK
                     if (oponent.TransCount > 1)
-                        obj = Instantiate(Resources.Load("IKBody")) as GameObject;
+                        obj = Instantiate(Resources.Load("NewAvatar/AvatarVRNoCam")) as GameObject;
 
                     obj.transform.parent = this.transform;
                     obj.name = "Client (" + oponent.Id + ")";
@@ -141,6 +141,15 @@ public class ClientManager : MonoBehaviour
                 --oponent.TTL;
                 if (oponent.TTL <= 0)
                     Destroy(obj);
+            }
+        }
+
+        for(int i = oponents.Count - 1; i >= 0; i--)
+        {
+            Oponent o = oponents.GetOponent(i);
+            if(o.TTL < 0)
+            {
+                oponents.RemoveOponent(o.Id);
             }
         }
     }

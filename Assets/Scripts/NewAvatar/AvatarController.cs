@@ -31,7 +31,7 @@ namespace avatar
 
     public static class AvatarFactory
     {
-        public static AvatarController Create(AvatarControllerType type, AvatarBody body)
+        public static AvatarController Create(AvatarControllerType type, AvatarBody body, bool isClient)
         {
             switch(type)
             {
@@ -39,7 +39,7 @@ namespace avatar
                     return new AvatarKeyboardController(body);
 
                 case AvatarControllerType.SENSORS:
-                    return new AvatarSensorsController(body);
+                    return new AvatarSensorsController(body, isClient);
 
                 case AvatarControllerType.NETWORK:
                     return new AvatarNetController(body);

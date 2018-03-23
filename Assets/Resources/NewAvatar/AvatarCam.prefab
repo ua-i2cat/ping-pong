@@ -2915,6 +2915,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 114942981813744608}
+  type: 0
+  isClient: 1
 --- !u!114 &114942981813744608
 MonoBehaviour:
   m_ObjectHideFlags: 1

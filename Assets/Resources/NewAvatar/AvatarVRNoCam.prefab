@@ -3120,7 +3120,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 114020434891325354}
-  type: 2
+  type: 1
+  isClient: 0
 --- !u!137 &137017662965464386
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1
