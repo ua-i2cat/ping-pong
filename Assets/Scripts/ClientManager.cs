@@ -29,11 +29,12 @@ public class ClientManager : MonoBehaviour
     private bool connecting = true;
 
     //private GameObject rig;
-    private bool spawned = false;
+    private bool justSpawned = false;
     private Vector3 spawnPos;
     private Trans spawn;
 
     public AvatarManager avatarManager;
+    public avatar.AvatarManager avatar;
 
     private Oponents oponents = new Oponents();
 
@@ -62,7 +63,7 @@ public class ClientManager : MonoBehaviour
         {
             connecting = false;
 
-            List<Trans> transforms = avatarManager.ControllerRig.GetTransforms();
+            List<Trans> transforms = avatar.controller.GetTransforms();
             Packet packet = PacketBuilder.Build(Packet.PacketType.Sensors, transforms);
             packet.Send(socket, new AsyncCallback(SendCallback));
         }
@@ -72,12 +73,13 @@ public class ClientManager : MonoBehaviour
             Connect();
         }
 
-        if (spawned)
+        if (justSpawned)
         {
             // Move Body and Rig? to the position and rotation received
-            avatarManager.Body.transform.position = spawn.Pos;
-            avatarManager.Body.transform.rotation = spawn.Rot;
-            spawned = false;
+            //avatarManager.Body.transform.position = spawn.Pos;
+            //avatarManager.Body.transform.rotation = spawn.Rot;
+            avatar.controller.SetTransforms(new List<Trans>() { spawn });
+            justSpawned = false;
         }
 
         ProcessOponents();
@@ -112,10 +114,10 @@ public class ClientManager : MonoBehaviour
 
                     // Body controlled by keyboard
                     if(oponent.TransCount == 1)
-                        obj = Instantiate(Resources.Load("RigBody")) as GameObject;
+                        obj = Instantiate(Resources.Load("NewAvatar/AvatarNoCam")) as GameObject;
 
                     // Body controlled by IK
-                    if(oponent.TransCount > 1)
+                    if (oponent.TransCount > 1)
                         obj = Instantiate(Resources.Load("IKBody")) as GameObject;
 
                     obj.transform.parent = this.transform;
@@ -128,9 +130,10 @@ public class ClientManager : MonoBehaviour
                     Transform child = obj.transform.Find(t.Id);
                     if (child == null)
                     {
-                        Debug.Log(t.Id);
+                        Debug.Log("Transform " + t.Id + " not found");
                         continue;
                     }
+                    Debug.Log("Transform: " + t.Id);
                     child.position = t.Pos;
                     child.rotation = t.Rot;
                 }
@@ -261,7 +264,7 @@ public class ClientManager : MonoBehaviour
                 case Packet.PacketType.Spawn:
                     Trans trans = ((PacketSpawn)packet).Data;
                     spawn = trans;
-                    spawned = true;
+                    justSpawned = true;
                     Debug.Log("[S->C]: Spawn Position = " + spawn.Pos + " (" + packet.Size + " of " + size + " bytes)");
                     break;
 

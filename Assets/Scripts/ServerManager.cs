@@ -30,7 +30,7 @@ public class ServerManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         // Get spawn transforms so that we can access them from another thread
-        spawnTrans = spawnTransforms.Select(x => new Trans(x.position, x.rotation)).ToList();
+        spawnTrans = spawnTransforms.Select(x => new Trans(x.position, x.rotation, x.name)).ToList();
 
         // Start listening
         listener = new TcpListener(IPAddress.Any, Constants.PORT);
