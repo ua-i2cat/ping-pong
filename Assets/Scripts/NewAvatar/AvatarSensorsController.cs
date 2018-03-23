@@ -41,61 +41,57 @@ namespace avatar
 
         public override void Update()
         {
-            LazyInit();
-
-            //this.body.SetIK(new Trans(eye.position, eye.rotation, Constants.Eye),
-            //    new Trans(lh.position, lh.rotation, Constants.LeftHand),
-            //    new Trans(rh.position, rh.rotation, Constants.RightHand));
-            //throw new System.NotImplementedException();
+            if(!initialized)
+                initialized = LazyInit();
         }
 
         private bool initialized = false;
-        private void LazyInit()
+        private bool LazyInit()
         {
-            if (!initialized)
+            var rig = Object.FindObjectOfType<SteamVR_ControllerManager>();
+            var cam = Object.FindObjectOfType<SteamVR_Camera>();
+            var sensors = Object.FindObjectsOfType<SteamVR_TrackedObject>();
+            
+            // If the sensors are not valid or not found, the initialization failed
+            if (sensors.Length > 0)
             {
-                var rig = Object.FindObjectOfType<SteamVR_ControllerManager>();
-                var cam = Object.FindObjectOfType<SteamVR_Camera>();
-                var sensors = Object.FindObjectsOfType<SteamVR_TrackedObject>();
-
-                if (sensors.Length > 0)
+                foreach (var s in sensors)
                 {
-                    initialized = true;
-                    foreach (var s in sensors)
-                    {
-                        if (!s.isValid)
-                            initialized = false;
-                    }
-                }
-
-                if (initialized)
-                {
-                    Debug.Log(rig.name + " " + rig.transform.position);
-                    Debug.Log(cam.name + " " + cam.transform.position);
-                    foreach (var s in sensors)
-                    {
-                        Debug.Log(s.name + " " + s.index + " " + s.transform.position);
-                    }
-
-                    transformsMap.Add(Constants.Rig, rig.transform);
-                    transformsMap.Add(Constants.Eye, cam.transform);
-                    foreach (var s in sensors)
-                    {
-                        if (s.transform.Find("attach") != null)
-                            transformsMap.Add(s.name, s.transform.Find("attach"));
-                        else
-                            transformsMap.Add(s.name, s.transform);
-                    }
-
-                    // Move the rig to match the camera position with the eyes of the model
-                    var bodyEye = this.body.transform.Find(Constants.Eye).position;
-                    Vector3 offset = rig.transform.position - cam.transform.position;
-                    rig.transform.position = bodyEye + offset;
-
-                    // Start the IK once everything is initialized
-                    this.body.SetIK(IKAction);
+                    if (!s.isValid)
+                        return false;
                 }
             }
+            else
+            {
+                return false;
+            }
+            
+
+            Debug.Log(rig.name + " " + rig.transform.position);
+            Debug.Log(cam.name + " " + cam.transform.position);
+            foreach (var s in sensors)
+            {
+                Debug.Log(s.name + " " + s.index + " " + s.transform.position);
+            }
+            
+            transformsMap.Add(Constants.Rig, rig.transform);
+            transformsMap.Add(Constants.Eye, cam.transform);
+            foreach (var s in sensors)
+            {
+                if (s.transform.Find("attach") != null)
+                    transformsMap.Add(s.name, s.transform.Find("attach"));
+                else
+                    transformsMap.Add(s.name, s.transform);
+            }
+            
+            // Move the rig to match the camera position with the eyes of the model
+            var bodyEye = this.body.transform.Find(Constants.Eye).position;
+            Vector3 offset = rig.transform.position - cam.transform.position;
+            rig.transform.position = bodyEye + offset;
+            
+            // Start the IK once everything is initialized
+            this.body.SetIK(IKAction);
+            return true;
         }
 
         private void IKAction(Animator animator)
