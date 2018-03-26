@@ -68,11 +68,11 @@ namespace avatar
                 }
                 if (Input.GetKey(KeyCode.E))
                 {
-                    body.Translate(new Vector3(0, -speed * Time.deltaTime, 0));
+                    //body.Translate(new Vector3(0, -speed * Time.deltaTime, 0));
                 }
                 if (Input.GetKey(KeyCode.Q))
                 {
-                    body.Translate(new Vector3(0, speed * Time.deltaTime, 0));
+                    //body.Translate(new Vector3(0, speed * Time.deltaTime, 0));
                 }
                 if (Input.GetKey(KeyCode.W))
                 {

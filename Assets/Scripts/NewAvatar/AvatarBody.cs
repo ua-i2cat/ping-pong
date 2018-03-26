@@ -42,7 +42,7 @@ namespace avatar
         }
 
         private void OnCollisionEnter(Collision collision)
-        {           
+        {
             Vector3 v = new Vector3(collision.contacts[0].point.x, 0, collision.contacts[0].point.z) - transform.position;
             transform.position -= v.normalized * 0.1f;
             isColliding = true;
