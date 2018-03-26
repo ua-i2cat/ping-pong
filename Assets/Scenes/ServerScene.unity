@@ -749,7 +749,6 @@ MonoBehaviour:
   spawnTransforms:
   - {fileID: 1518604324}
   - {fileID: 891256535}
-  - {fileID: 1083349542}
 --- !u!1 &1550466416
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 // Author: alexandre.via@i2cat.net
 
+using SharpConfig;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ using UnityEngine.UI;
 public class ClientManager : MonoBehaviour
 {
     private Socket socket;
+
+    // Hardcoded default values
     public string ip = Constants.IP;
     public int port = Constants.PORT;
 
@@ -53,6 +56,11 @@ public class ClientManager : MonoBehaviour
 
         recvTextField = GameObject.Find("RecvTxt").GetComponent<Text>();
         onlineTxt = GameObject.Find("OnlineTxt").GetComponent<Text>();
+
+        // Get ip and port from config file
+        Configuration clientConfig = Configuration.LoadFromFile("Config.cfg");
+        ip = clientConfig["Server"]["IP"].StringValue;
+        port = clientConfig["Server"]["Port"].IntValue;
     }
 
     private void Update()
@@ -301,7 +309,7 @@ public class ClientManager : MonoBehaviour
     {
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         socket.BeginConnect(IPAddress.Parse(ip), port, new AsyncCallback(ConnectCallback), null);
-        Debug.Log("Connecting to the server...");
+        Debug.Log("Connecting to the server at [" + ip + ":" + port + "] ...");
     }
     private void Disconnect()
     {
