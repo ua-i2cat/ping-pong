@@ -13,6 +13,8 @@ namespace avatar
         private Animator animator;
         private Action<Animator> IKAction = null;
 
+        public bool isColliding = false;
+
         private void Awake()
         {
             animator = GetComponent<Animator>();
@@ -37,6 +39,24 @@ namespace avatar
         {
             if (this.IKAction != null)
                 IKAction(animator);
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {           
+            Vector3 v = new Vector3(collision.contacts[0].point.x, 0, collision.contacts[0].point.z) - transform.position;
+            transform.position -= v.normalized * 0.1f;
+            isColliding = true;
+        }
+
+        // In case the player stays stuck
+        private void OnCollisionStay(Collision collision)
+        {
+            isColliding = false;
+        }
+
+        private void OnCollisionExit(Collision collision)
+        {
+            isColliding = false;
         }
     }
 }

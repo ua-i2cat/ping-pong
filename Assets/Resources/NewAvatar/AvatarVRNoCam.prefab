@@ -1244,6 +1244,7 @@ GameObject:
   - component: {fileID: 4836470398473172}
   - component: {fileID: 95007339834570028}
   - component: {fileID: 114020434891325354}
+  - component: {fileID: 136629064393875702}
   m_Layer: 0
   m_Name: Malcolm
   m_TagString: Untagged
@@ -3108,6 +3109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdb0e53e0a271994c8919b617ae75e80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isColliding: 0
 --- !u!114 &114712903552116002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3122,6 +3124,19 @@ MonoBehaviour:
   body: {fileID: 114020434891325354}
   type: 1
   isClient: 0
+--- !u!136 &136629064393875702
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1726708699541080}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 1
+  m_Height: 3.61
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.93, z: 0}
 --- !u!137 &137017662965464386
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

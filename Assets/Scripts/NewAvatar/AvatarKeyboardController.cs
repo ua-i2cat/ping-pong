@@ -55,7 +55,7 @@ namespace avatar
 
         public override void Update()
         {
-            if (!canvas.enabled)
+            if (!canvas.enabled && !body.isColliding)
             {
                 // Translate
                 if (Input.GetKey(KeyCode.D))

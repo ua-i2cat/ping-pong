@@ -141,7 +141,7 @@ public class ClientManager : MonoBehaviour
                         Debug.Log("Transform " + t.Id + " not found");
                         continue;
                     }
-                    Debug.Log("Transform: " + t.Id);
+                    //Debug.Log("Transform: " + t.Id);
                     child.position = t.Pos;
                     child.rotation = t.Rot;
                 }
