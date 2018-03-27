@@ -21,6 +21,8 @@ public class Packet
         // Only Server can send:
         Spawn,          // [S->C]
         OtherClients,   // [S->C]
+
+        Benchmark,
     };
 
     private List<byte> data = new List<byte>();
@@ -223,6 +225,31 @@ public class PacketOtherClients
             }
 
             return clients;
+        }
+    }
+}
+
+public class PacketBenchmark
+{
+    private Packet p;
+
+    private PacketBenchmark(Packet p)
+    {
+        this.p = p;
+    }
+
+    public static explicit operator PacketBenchmark(Packet p)
+    {
+        return new PacketBenchmark(p);
+    }
+
+    public NetBenchmarks Data
+    {
+        get
+        {
+            long sendTimeStamp = BitConverter.ToInt64(p.ToArray(), 3);
+            long recvTimeStamp = BitConverter.ToInt64(p.ToArray(), 11);
+            return new NetBenchmarks(sendTimeStamp, recvTimeStamp);
         }
     }
 }

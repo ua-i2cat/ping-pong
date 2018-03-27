@@ -24,6 +24,8 @@ public class ServerManager : MonoBehaviour
     public List<Transform> spawnTransforms = new List<Transform>();
     private List<Trans> spawnTrans = new List<Trans>();
 
+    public bool benchmarkEnabled = false;
+
     private void Awake()
     {
         // Fix the target framerate for standalone platforms
@@ -63,6 +65,13 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
+
+        // Benchmarks
+        if(benchmarkEnabled && clients.Count > 0)
+        {
+            Packet packet = PacketBuilder.Build(Packet.PacketType.Benchmark, new NetBenchmarks());
+            packet.Send(clients[0].socket, new AsyncCallback(SendCallback));
+        }
     }
 
     private void OnApplicationQuit()
@@ -86,7 +95,7 @@ public class ServerManager : MonoBehaviour
         {
             foreach (var client in clients)
             {
-                // Instantiate if a client is connected and doesn't have an instance already
+                // Instantiate if a client is connected and doesn't have an instance yet
                 if (client.instance == null && client.TransformCount > 0)
                 {
                     client.instance = new GameObject(client.socket.RemoteEndPoint.ToString());
@@ -199,8 +208,7 @@ public class ServerManager : MonoBehaviour
         Socket socket = (Socket)AR.AsyncState;
         try
         { 
-            /*int bytes_sent = */
-            socket.EndSend(AR);
+            int bytes_sent = socket.EndSend(AR);
             //Debug.Log(bytes_sent + " bytes sent");
 
             Thread.Sleep(1000 / packetRate);
@@ -271,6 +279,11 @@ public class ServerManager : MonoBehaviour
                         List<Trans> transforms = ((PacketSensors)packet).Data;
                         foreach(Trans t in transforms)
                             client.SetTransform(t.Id, t);
+                        break;
+
+                    case Packet.PacketType.Benchmark:
+                        NetBenchmarks b = ((PacketBenchmark)packet).Data;
+                        Debug.Log("RTT: " + (b.recvTimeStamp - b.sendTimeStamp) + " ms.");
                         break;
 
                     default:

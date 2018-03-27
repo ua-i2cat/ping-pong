@@ -61,6 +61,10 @@ public static class PacketBuilder
                     size += sizeof(int) + sizeof(byte) + client.TransformCount * Trans.Size;
                 break;
 
+            case Packet.PacketType.Benchmark:
+                size += NetBenchmarks.Size;
+                break;
+
             default:
                 throw new ArgumentException("Invalid PacketType!");
         }
@@ -97,6 +101,12 @@ public static class PacketBuilder
                 content.Add((byte)clients.Count);
                 foreach (var client in clients)
                     content.AddRange(client.Serialize());
+                break;
+
+            case Packet.PacketType.Benchmark:
+                NetBenchmarks benchmarks = (NetBenchmarks)data;
+                content.AddRange(BitConverter.GetBytes(benchmarks.sendTimeStamp));
+                content.AddRange(BitConverter.GetBytes(benchmarks.recvTimeStamp));
                 break;
 
             default:

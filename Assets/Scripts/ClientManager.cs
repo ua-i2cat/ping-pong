@@ -19,9 +19,9 @@ public class ClientManager : MonoBehaviour
 {
     private Socket socket;
 
-    // Hardcoded default values
-    public string ip = Constants.IP;
-    public int port = Constants.PORT;
+    // Fallback values in case the config file is not found
+    private string ip = Constants.IP;
+    private int port = Constants.PORT;
 
     private const int BUFF_SIZE = 8192;
     private byte[] recvBuffer = new byte[BUFF_SIZE];
@@ -31,12 +31,10 @@ public class ClientManager : MonoBehaviour
     public bool Reconnect = true;
     private bool connecting = true;
 
-    //private GameObject rig;
     private bool justSpawned = false;
     private Vector3 spawnPos;
     private Trans spawn;
 
-    public AvatarManager avatarManager;
     public avatar.AvatarManager avatar;
 
     private Oponents oponents = new Oponents();
@@ -58,9 +56,17 @@ public class ClientManager : MonoBehaviour
         onlineTxt = GameObject.Find("OnlineTxt").GetComponent<Text>();
 
         // Get ip and port from config file
-        Configuration clientConfig = Configuration.LoadFromFile("Config.cfg");
-        ip = clientConfig["Server"]["IP"].StringValue;
-        port = clientConfig["Server"]["Port"].IntValue;
+        try
+        {
+            Configuration clientConfig = Configuration.LoadFromFile("Config.cfg");
+            ip = clientConfig["Server"]["IP"].StringValue;
+            port = clientConfig["Server"]["Port"].IntValue;
+        }
+        catch
+        {
+            Debug.LogWarning("Failed to load Configuration file!");
+            Debug.LogWarning("Using default values: [" + ip + ":" + port + "]");
+        }
     }
 
     private void Update()
@@ -117,14 +123,11 @@ public class ClientManager : MonoBehaviour
                 GameObject obj = GameObject.Find("Client (" + oponent.Id + ")");
                 if (obj == null)
                 {
-                    //var o = Instantiate(Resources.Load("AvatarManagerNet")) as GameObject;
-                    //o.transform.parent = this.transform;
-
                     // Body controlled by keyboard
                     if(oponent.TransCount == 1)
                         obj = Instantiate(Resources.Load("NewAvatar/AvatarNoCam")) as GameObject;
 
-                    // Body controlled by IK
+                    // Body controlled by VR sensors
                     if (oponent.TransCount > 1)
                         obj = Instantiate(Resources.Load("NewAvatar/AvatarVRNoCam")) as GameObject;
 
@@ -135,7 +138,7 @@ public class ClientManager : MonoBehaviour
                 for (int j = 0; j < oponent.TransCount; j++)
                 {
                     t = oponent.GetTrans(j);
-                    Transform child = obj.transform.Find(t.Id);
+                    Transform child = obj.transform.FindDeepChild(t.Id);
                     if (child == null)
                     {
                         Debug.Log("Transform " + t.Id + " not found");
@@ -263,6 +266,7 @@ public class ClientManager : MonoBehaviour
         }
 
         int dataIndex = 0;
+        // Keep reading while there is data left in the buffer
         while (dataIndex < size)
         {
             // Parse a packet from the data buffer
@@ -272,22 +276,20 @@ public class ClientManager : MonoBehaviour
             switch(packet.Type)
             {
                 case Packet.PacketType.Text:
-                    string text = ((PacketText)packet).Data;
-                    recvText = text;
+                    recvText = ((PacketText)packet).Data;
                     receivedNewText = true;
-                    Debug.Log("[S->C]: " + text + " (" + packet.Size + " of " + size + " bytes)");
+                    Debug.Log("[S->C]: " + recvText + " (" + packet.Size + " of " + size + " bytes)");
                     break;
 
                 case Packet.PacketType.Spawn:
-                    Trans trans = ((PacketSpawn)packet).Data;
-                    spawn = trans;
+                    spawn = ((PacketSpawn)packet).Data;
                     justSpawned = true;
                     Debug.Log("[S->C]: Spawn Position = " + spawn.Pos + " (" + packet.Size + " of " + size + " bytes)");
                     break;
 
                 case Packet.PacketType.OtherClients:
-                    var ocs = ((PacketOtherClients)packet).Data;
-                    foreach(var c in ocs)
+                    var others = ((PacketOtherClients)packet).Data;
+                    foreach(var c in others)
                     {
                         Oponent oponent = oponents.AddOponent(c.Id);
                         for (int i = 0; i < c.TransCount; i++)
@@ -295,9 +297,15 @@ public class ClientManager : MonoBehaviour
                     }
                     break;
 
+                case Packet.PacketType.Benchmark:
+                    NetBenchmarks b = ((PacketBenchmark)packet).Data;
+                    b.recvTimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    PacketBuilder.Build(Packet.PacketType.Benchmark, b).Send(socket, new AsyncCallback(SendCallback));
+                    break;
+
                 default:
                     Debug.Assert(false);
-                    Debug.Log("Invalid PacketType" + " (" + packet.Size + " of " + size + " bytes)");
+                    Debug.LogError("Invalid PacketType" + " (" + packet.Size + " of " + size + " bytes)");
                     break;
             }
         }
