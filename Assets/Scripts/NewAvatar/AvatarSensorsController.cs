@@ -44,24 +44,36 @@ namespace avatar
 
         public override void Update()
         {
-            if(!initialized && isClient)
-                initialized = LazyInit();
+            if (!initialized)
+            {
+                initialized = isClient ? InitSelf() : InitOponent();
+            }
+
+            if (initialized)
+            {
+                // Start the IK once everything is initialized
+                this.body.SetIK(IKAction);
+            }
         }
 
         private bool initialized = false;
-        private bool LazyInit()
+        private bool InitSelf()
         {
             var rig = Object.FindObjectOfType<SteamVR_ControllerManager>();
             var cam = Object.FindObjectOfType<SteamVR_Camera>();
             var sensors = Object.FindObjectsOfType<SteamVR_TrackedObject>();
-            
+
             // If the sensors are not valid or not found, the initialization failed
-            if (sensors.Length > 0)
+            Debug.Log(sensors.Length + " sensors detected");
+            if (sensors.Length == 5)
             {
                 foreach (var s in sensors)
                 {
                     if (!s.isValid)
+                    {
+                        Debug.Log(s.name + " is invalid");
                         return false;
+                    }
                 }
             }
             else
@@ -92,26 +104,45 @@ namespace avatar
             Vector3 offset = rig.transform.position - cam.transform.position;
             rig.transform.position = bodyEye + offset;
             
-            // Start the IK once everything is initialized
-            this.body.SetIK(IKAction);
+            return true;
+        }
+
+        private bool InitOponent()
+        {
+            var rig = this.body.transform.parent.Find(Constants.Rig);
+
+            if(rig == null || rig.childCount < 1)
+            {
+                return false;
+            }
+
+            transformsMap.Add(Constants.Rig, rig);
+
+            foreach(Transform child in rig)
+            {
+                transformsMap.Add(child.name, child);
+            }
+
             return true;
         }
 
         private void IKAction(Animator animator)
         {
+            if (transformsMap.Keys.Count < 1)
+                return;
+
             animator.SetLookAtWeight(1);
             Vector3 lookAt = transformsMap[Constants.Eye].position + 
                 transformsMap[Constants.Eye].forward;
             animator.SetLookAtPosition(lookAt);
 
             // Use hip as the root
-            if(transformsMap.ContainsKey(Constants.Hip))
+            if(transformsMap.ContainsKey(Constants.Hip) && transformsMap[Constants.Hip].localPosition != Vector3.zero)
             {
-                throw new System.NotImplementedException();
                 Transform hip = transformsMap[Constants.Hip];
                 body.transform.rotation = Quaternion.Euler(new Vector3(0, hip.eulerAngles.y, 0));
                 body.transform.position = new Vector3(hip.position.x, body.transform.position.y, 
-                    hip.position.z);
+                    hip.position.z) - new Vector3(0, 0, 0.3f);
             }
             // Use the headset to move and rotate the model
             else if(transformsMap.ContainsKey(Constants.Eye))
