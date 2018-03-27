@@ -12,6 +12,8 @@ public class Oponents
     private System.Object listLock = new System.Object();
     private List<Oponent> oponents = new List<Oponent>();
 
+    // Adds an oponent to the list of oponents if it doesn't already 
+    // exist one with the specified id and returns the Oponent object
     public Oponent AddOponent(int id)
     {
         lock (listLock)
@@ -27,6 +29,7 @@ public class Oponents
         }
     }
 
+    // Removed an oponent from the list by id if it exists
     public void RemoveOponent(int id)
     {
         lock(listLock)
@@ -43,6 +46,7 @@ public class Oponents
     {
         get { lock (listLock) { return oponents.Count; } }
     }
+
     public Oponent GetOponent(int index)
     {
         lock (listLock)
@@ -55,17 +59,17 @@ public class Oponents
 public class Oponent
 {
     private System.Object oponentLock = new System.Object();
-
-    private int id;
     private List<Trans> transforms = new List<Trans>();
 
     public int TTL = 100;
 
     public Oponent(int id)
     {
-        this.id = id;
+        this.Id = id;
     }
 
+    // Adds a transform, only if it doesn't already exist one with the same id.
+    // If it already exists, the position and rotation are updated
     public void AddTransform(Trans t)
     {
         lock (oponentLock)
@@ -83,7 +87,7 @@ public class Oponent
         }
     }
 
-    public int Id { get { return id; } }
+    public int Id { get; }
     public int TransCount { get { lock (oponentLock) { return transforms.Count; } } }
     public Trans GetTrans(int index)
     {

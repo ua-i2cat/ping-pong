@@ -28,6 +28,9 @@ public class ClientData
     {
         lock (transformLock)
         {
+            if (!transforms.ContainsKey(name))
+                Debug.Log("Adding transform " + name + " for the first time");
+
             transforms[name] = value;
             //if(transforms.Count > 7)
             //    Debug.Log(transforms.Count + " name: " + name + " Id: " + value.Id);

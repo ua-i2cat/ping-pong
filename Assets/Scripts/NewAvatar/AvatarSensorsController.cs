@@ -12,12 +12,14 @@ namespace avatar
         private Dictionary<string, Transform> transformsMap = new Dictionary<string, Transform>();
 
         private bool isClient;
+        private int minimumSensors;
 
-        public AvatarSensorsController(AvatarBody body, bool isClient)
+        public AvatarSensorsController(AvatarBody body, bool isClient, int minimumSensors)
         {
             this.type = AvatarControllerType.SENSORS;
             this.body = body;
             this.isClient = isClient;
+            this.minimumSensors = minimumSensors;
 
             // Move the rig to match the eye of the body
         }
@@ -64,8 +66,8 @@ namespace avatar
             var sensors = Object.FindObjectsOfType<SteamVR_TrackedObject>();
 
             // If the sensors are not valid or not found, the initialization failed
-            Debug.Log(sensors.Length + " sensors detected");
-            if (sensors.Length == 5)
+            // The camera is a sensor but not of type SteamVR_TrackedObject
+            if (sensors.Length >= minimumSensors - 1)
             {
                 foreach (var s in sensors)
                 {
@@ -103,7 +105,8 @@ namespace avatar
             var bodyEye = this.body.transform.Find(Constants.Eye).position;
             Vector3 offset = rig.transform.position - cam.transform.position;
             rig.transform.position = bodyEye + offset;
-            
+
+            Debug.Log("All sensors found");
             return true;
         }
 
@@ -178,8 +181,9 @@ namespace avatar
                     transformsMap[Constants.RightHand].rotation);
             }
 
-            if (transformsMap.ContainsKey(Constants.LeftFoot))
+            if (transformsMap.ContainsKey(Constants.LeftFoot) && transformsMap[Constants.LeftFoot].localPosition != Vector3.zero)
             {
+                Debug.Log("contains LF");
                 animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
                 animator.SetIKPosition(AvatarIKGoal.LeftFoot,
                     transformsMap[Constants.LeftFoot].position);
@@ -188,7 +192,7 @@ namespace avatar
                     transformsMap[Constants.LeftFoot].rotation);
             }
 
-            if (transformsMap.ContainsKey(Constants.RightFoot))
+            if (transformsMap.ContainsKey(Constants.RightFoot) && transformsMap[Constants.RightFoot].localPosition != Vector3.zero)
             {
                 animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
                 animator.SetIKPosition(AvatarIKGoal.RightFoot,

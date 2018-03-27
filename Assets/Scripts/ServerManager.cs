@@ -145,6 +145,7 @@ public class ServerManager : MonoBehaviour
         }
     }
 
+    // Check for disconnected clients and remove them
     private void RemoveDisconnectedClients()
     {
         lock (clientsLock)
@@ -153,7 +154,11 @@ public class ServerManager : MonoBehaviour
             {
                 if (!clients[i].socket.Connected)
                 {
-                    Destroy(clients[i].instance);
+                    if (clients[i].instance != null)
+                    {
+                        Debug.Log("Client has disconnected " + clients[i].instance.name);
+                        Destroy(clients[i].instance);
+                    }
                     clients.Remove(clients[i]);
                 }
             }
@@ -249,7 +254,7 @@ public class ServerManager : MonoBehaviour
         {
             if (size == 0)
             {
-                Debug.Log("Client has disconnected " + client.socket.RemoteEndPoint);
+                // The client has disconnected
                 return false;
             }
 

@@ -329,10 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1090ecf56bb49fb4ea0b2ca438a9efd4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ip: 147.83.206.67
-  port: 33333
   Reconnect: 0
-  avatarManager: {fileID: 0}
   avatar: {fileID: 980212586}
 --- !u!1 &225079245
 GameObject:
@@ -1056,7 +1053,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4134701381592008, guid: f973b731128a30f4a91b92ccd833db1d, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -2.305
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 4134701381592008, guid: f973b731128a30f4a91b92ccd833db1d, type: 2}
       propertyPath: m_LocalRotation.x

@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ClientSceneVR.unity
     guid: d2e26aca4e52abe46a38c5d31b0444f8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ClientSceneKeyboard.unity
     guid: 0e7800358e3b0b14296c5ab1971a054b
+  - enabled: 1
+    path: Assets/Scenes/ClientSceneVRUpperBody.unity
+    guid: 5a54098478f9bba4dabd3f9c64dfae18

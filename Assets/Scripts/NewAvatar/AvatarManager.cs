@@ -11,11 +11,12 @@ namespace avatar
         public AvatarBody body;
         public AvatarController controller;
         public AvatarControllerType type;
+        public int minimumSensors = 3;
         public bool isClient;
 
         private void Start()
         {
-            controller = AvatarFactory.Create(type, body, isClient);
+            controller = AvatarFactory.Create(type, body, isClient, minimumSensors);
         }
 
         private void Update()

@@ -35,8 +35,10 @@ public class ClientManager : MonoBehaviour
     private Vector3 spawnPos;
     private Trans spawn;
 
+    // The avatar of the client itself
     public avatar.AvatarManager avatar;
 
+    // List of other connected clients
     private Oponents oponents = new Oponents();
 
     private bool receivedNewText = false;
@@ -65,7 +67,7 @@ public class ClientManager : MonoBehaviour
         catch
         {
             Debug.LogWarning("Failed to load Configuration file!");
-            Debug.LogWarning("Using default values: [" + ip + ":" + port + "]");
+            Debug.LogWarning("Using the default values: [" + ip + ":" + port + "]");
         }
     }
 
@@ -291,6 +293,7 @@ public class ClientManager : MonoBehaviour
                     var others = ((PacketOtherClients)packet).Data;
                     foreach(var c in others)
                     {
+                        // Add or update an oponent by its Id (and restore its TTL)
                         Oponent oponent = oponents.AddOponent(c.Id);
                         for (int i = 0; i < c.TransCount; i++)
                             oponent.AddTransform(c.GetTrans(i));
