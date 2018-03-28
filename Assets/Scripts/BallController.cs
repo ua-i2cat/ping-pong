@@ -10,7 +10,7 @@ public class BallController : MonoBehaviour
 {
     private GameObject paddle;
     private Rigidbody rb;
-    public Vector3 ballOffset = new Vector3(0, 0.5f, 0.1f);
+    public Vector3 ballOffset = new Vector3(0, 0.5f, 0);
     public bool serve = false;
     //private PaddleSpeed paddleSpeed;
 
@@ -31,7 +31,12 @@ public class BallController : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             transform.rotation = Quaternion.identity;
             Vector3 paddlePos = paddle.transform.position;
-            transform.position = new Vector3(paddlePos.x, paddlePos.y, paddlePos.z) + ballOffset;
+            Vector3 paddleBase = paddle.GetComponent<BoxCollider>().center;
+            Debug.DrawLine(paddlePos, paddlePos + paddle.transform.forward * 0.2f, Color.red, 10);
+            Debug.DrawLine(paddlePos + paddle.transform.forward * 0.2f,
+                paddlePos + paddle.transform.forward * 0.2f + paddle.transform.up * 0.5f,
+                Color.blue, 10);
+            transform.position = paddlePos + paddle.transform.forward * 0.2f + Vector3.up * 0.5f;           
 
             serve = false;
         }
