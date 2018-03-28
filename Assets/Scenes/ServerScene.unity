@@ -579,21 +579,21 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &947658728
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 947658727}
-  m_LocalRotation: {x: -0, y: 0.99234015, z: -0.12353626, w: 0}
-  m_LocalPosition: {x: 0, y: 0.996, z: 1.88}
+  m_LocalRotation: {x: -0, y: 0.97960615, z: -0.20092764, w: 0}
+  m_LocalPosition: {x: 0, y: 1.2, z: 1.792}
   m_LocalScale: {x: 0.11692, y: 0.11692, z: 0.11692}
   m_Children:
   - {fileID: 1106560771}
   m_Father: {fileID: 0}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 14.192, y: 180.00002, z: 0}
+  m_LocalEulerAnglesHint: {x: 23.182001, y: 180.00002, z: 0}
 --- !u!65 &947658729
 BoxCollider:
   m_ObjectHideFlags: 0

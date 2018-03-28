@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// Taken from @Bunny83 at https://answers.unity.com/questions/799429/transformfindstring-no-longer-finds-grandchild.html
+
+using UnityEngine;
 
 public static class TransformDeepChildExtension
 {
