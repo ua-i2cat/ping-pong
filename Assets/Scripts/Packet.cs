@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using UnityEngine;
 
 public class Packet
@@ -21,6 +22,7 @@ public class Packet
         // Only Server can send:
         Spawn,          // [S->C]
         OtherClients,   // [S->C]
+        Objects,        // [S->C]
 
         Benchmark,
     };
@@ -225,6 +227,52 @@ public class PacketOtherClients
             }
 
             return clients;
+        }
+    }
+}
+
+public class PacketObjects
+{
+    private Packet p;
+
+    private PacketObjects(Packet p)
+    {
+        this.p = p;
+    }
+
+    public static explicit operator PacketObjects(Packet p)
+    {
+        return new PacketObjects(p);
+    }
+
+    public List<Trans> Data
+    {
+        get
+        {
+            List<Trans> objects = new List<Trans>();
+
+            int dataIndex = 3;
+            int objCount = p.ToArray()[dataIndex++];
+            for (int i = 0; i < objCount; i++)
+            {
+                string name = Encoding.ASCII.GetString(p.ToArray(), dataIndex, 4); dataIndex += 4;
+
+                float x = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+                float y = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+                float z = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+
+                float qx = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+                float qy = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+                float qz = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+                float qw = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
+
+                Vector3 pos = new Vector3(x, y, z);
+                Quaternion rot = new Quaternion(qx, qy, qz, qw);
+
+                objects.Add(new Trans(pos, rot, name));
+            }
+
+            return objects;
         }
     }
 }

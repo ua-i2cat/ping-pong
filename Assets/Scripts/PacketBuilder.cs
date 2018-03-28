@@ -61,6 +61,13 @@ public static class PacketBuilder
                     size += sizeof(int) + sizeof(byte) + client.TransformCount * Trans.Size;
                 break;
 
+            case Packet.PacketType.Objects:
+                List<Trans> objects = (List<Trans>)data;
+                size += 1; // Number of objects (0-255)
+                foreach (var obj in objects)
+                    size += Trans.Size;
+                break;
+
             case Packet.PacketType.Benchmark:
                 size += NetBenchmarks.Size;
                 break;
@@ -101,6 +108,13 @@ public static class PacketBuilder
                 content.Add((byte)clients.Count);
                 foreach (var client in clients)
                     content.AddRange(client.Serialize());
+                break;
+
+            case Packet.PacketType.Objects:
+                List<Trans> objects = (List<Trans>)data;
+                content.Add((byte)objects.Count);
+                foreach (var trans in objects)
+                    content.AddRange(trans.Serialize());
                 break;
 
             case Packet.PacketType.Benchmark:
