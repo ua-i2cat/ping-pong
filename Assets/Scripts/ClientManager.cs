@@ -41,10 +41,15 @@ public class ClientManager : MonoBehaviour
     // List of other connected clients
     private Oponents oponents = new Oponents();
 
+    // List of objects
+    private List<Trans> objects = new List<Trans>();
+
     private bool receivedNewText = false;
     private string recvText;
     private Text recvTextField;
     private Text onlineTxt;
+
+    private SteamVR_TrackedController inputController;
 
     private void Awake()
     {
@@ -99,8 +104,10 @@ public class ClientManager : MonoBehaviour
         }
 
         ProcessOponents();
+        ProcessObjects();
     }
 
+    private SteamVR_TrackedController controller;
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -111,6 +118,22 @@ public class ClientManager : MonoBehaviour
         {
             Application.Quit();
         }
+
+        if (inputController == null)
+        {
+            inputController = GameObject.FindObjectOfType<SteamVR_TrackedController>();
+            if(inputController != null)
+            {
+                inputController.TriggerClicked += OnTriggerClicked;
+            }
+        } 
+    }
+
+    private void OnTriggerClicked(object sender, ClickedEventArgs e)
+    {
+        Debug.Log("Trigger Pressed");
+        Packet packet = PacketBuilder.Build(Packet.PacketType.Text, "serve");
+        packet.Send(socket, new AsyncCallback(SendCallback));
     }
 
     private void ProcessOponents()
@@ -164,6 +187,22 @@ public class ClientManager : MonoBehaviour
             {
                 oponents.RemoveOponent(o.Id);
             }
+        }
+    }
+
+    private void ProcessObjects()
+    {
+        foreach(var obj in objects)
+        {
+            var instance = GameObject.Find(obj.Id);
+            if(instance == null)
+            {
+                instance = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                instance.name = obj.Id;
+                instance.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            }
+            instance.transform.position = obj.Pos;
+            instance.transform.rotation = obj.Rot;
         }
     }
 
@@ -297,6 +336,24 @@ public class ClientManager : MonoBehaviour
                         Oponent oponent = oponents.AddOponent(c.Id);
                         for (int i = 0; i < c.TransCount; i++)
                             oponent.AddTransform(c.GetTrans(i));
+                    }
+                    break;
+
+                case Packet.PacketType.Objects:
+                    List<Trans> objectsRecv = ((PacketObjects)packet).Data;
+                    foreach(var o in objectsRecv)
+                    {
+                        Trans t = objects.Where(x => x.Id == o.Id).FirstOrDefault();
+                        if(t == null)
+                        {
+                            Debug.Log("Received " + o.Id + " for the first time");
+                            objects.Add(o);
+                        }
+                        else
+                        {
+                            t.Pos = o.Pos;
+                            t.Rot = o.Rot;
+                        }
                     }
                     break;
 

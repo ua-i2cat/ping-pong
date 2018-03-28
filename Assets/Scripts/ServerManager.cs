@@ -24,6 +24,10 @@ public class ServerManager : MonoBehaviour
     public List<Transform> spawnTransforms = new List<Transform>();
     private List<Trans> spawnTrans = new List<Trans>();
 
+    public List<Transform> objectsToSend = new List<Transform>();
+
+    private BallController ballController;
+
     public bool benchmarkEnabled = false;
 
     private void Awake()
@@ -41,6 +45,8 @@ public class ServerManager : MonoBehaviour
         // Start accepting connections
         listener.BeginAcceptSocket(new AsyncCallback(AcceptCallback), null);
         Debug.Log("Server listening on port " + Constants.PORT);
+
+        ballController = GameObject.Find("Ball").GetComponent<BallController>();
     }
 
     private void Update()
@@ -102,9 +108,14 @@ public class ServerManager : MonoBehaviour
                     foreach (var key in client.TransformKeys)
                     {
                         GameObject obj;
-                        if (key.Contains(/*Constants.RightHand*/"TODO"))
+                        if (key.Contains(Constants.RightHand))
                         {
-                            obj = Instantiate(Resources.Load("RH")) as GameObject;
+                            // @TODO: Create a prefab for this! Hardcoded collider for now.
+                            obj = new GameObject("RH");
+                            obj.transform.localScale = new Vector3(0.11692f, 0.11692f, 0.11692f);
+                            var collider = obj.AddComponent<BoxCollider>();
+                            collider.center = new Vector3(0, 0, 1.2f);
+                            collider.size = new Vector3(1.5f, 0.15f, 2.5f);
                         }
                         else
                         {
@@ -139,6 +150,14 @@ public class ServerManager : MonoBehaviour
                     var others = clients.Where(x => x.socket.Handle != client.socket.Handle
                         && x.TransformCount > 0 && x.instance != null).ToList();
                     Packet packet = PacketBuilder.Build(Packet.PacketType.OtherClients, others);
+                    packet.Send(client.socket, new AsyncCallback(SendCallback));
+                }
+
+                // Send the objectsToSend if any
+                if (objectsToSend.Count > 0)
+                {
+                    List<Trans> objects = objectsToSend.Select(x => new Trans(x.position, x.rotation, x.name)).ToList();
+                    Packet packet = PacketBuilder.Build(Packet.PacketType.Objects, objects);
                     packet.Send(client.socket, new AsyncCallback(SendCallback));
                 }
             }
@@ -270,6 +289,11 @@ public class ServerManager : MonoBehaviour
                 {
                     case Packet.PacketType.Text:
                         string text = ((PacketText)packet).Data;
+                        if(text == "serve")
+                        {
+                            Debug.Log("Serving Ball");
+                            ballController.serve = true;
+                        }
                         Debug.Log("[C(" + client.socket.RemoteEndPoint + ")->S]: " + text
                             + " (" + packet.Size + " of " + size + " bytes)");
                         foreach (var c in clients)
