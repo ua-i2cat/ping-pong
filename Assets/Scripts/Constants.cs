@@ -15,4 +15,6 @@ public static class Constants
     public static string Hip = "Hip";
     public static string LeftFoot = "LF";
     public static string RightFoot = "RF";
+
+    public static string ServeRequest = "ServeRequest";
 }

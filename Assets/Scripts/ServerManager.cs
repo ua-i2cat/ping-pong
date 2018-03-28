@@ -289,7 +289,7 @@ public class ServerManager : MonoBehaviour
                 {
                     case Packet.PacketType.Text:
                         string text = ((PacketText)packet).Data;
-                        if(text == "serve")
+                        if(text == Constants.ServeRequest)
                         {
                             Debug.Log("Serving Ball");
                             ballController.serve = true;

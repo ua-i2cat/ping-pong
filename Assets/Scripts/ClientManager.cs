@@ -107,7 +107,6 @@ public class ClientManager : MonoBehaviour
         ProcessObjects();
     }
 
-    private SteamVR_TrackedController controller;
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -132,7 +131,8 @@ public class ClientManager : MonoBehaviour
     private void OnTriggerClicked(object sender, ClickedEventArgs e)
     {
         Debug.Log("Trigger Pressed");
-        Packet packet = PacketBuilder.Build(Packet.PacketType.Text, "serve");
+        // When the server interprets this packet, the ball is served to the client that made the request
+        Packet packet = PacketBuilder.Build(Packet.PacketType.Text, Constants.ServeRequest);
         packet.Send(socket, new AsyncCallback(SendCallback));
     }
 
@@ -229,6 +229,12 @@ public class ClientManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         Disconnect();
+
+        // Make sure the deregister the events to avoid Memory Leaks!!
+        if(inputController != null)
+        {
+            inputController.TriggerClicked -= OnTriggerClicked;
+        }
     }
 
     #region Callbacks
