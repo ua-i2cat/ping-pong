@@ -232,6 +232,7 @@ public class ServerManager : MonoBehaviour
         try
         { 
             int bytes_sent = socket.EndSend(AR);
+            Debug.Assert(bytes_sent > 0);
             //Debug.Log(bytes_sent + " bytes sent");
 
             Thread.Sleep(1000 / packetRate);
