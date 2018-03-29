@@ -95,7 +95,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4174949497223350}
   - component: {fileID: 137086344833129424}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Face
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -457,7 +457,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4966497879756222}
   - component: {fileID: 137596621261644214}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Hair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -866,7 +866,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4493311982386078}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -897,7 +897,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4580803500812156}
   - component: {fileID: 137166135334960170}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Hats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1123,7 +1123,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4242779842446736}
   - component: {fileID: 137819521301541200}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1245,7 +1245,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4061250643635546}
   - component: {fileID: 137721297370126872}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: default
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2854,6 +2854,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   body: {fileID: 114483675456950746}
   type: 2
+  minimumSensors: 3
   isClient: 0
 --- !u!136 &136608370449369264
 CapsuleCollider:
