@@ -6,24 +6,26 @@ using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
-    private GameObject paddle;
+    public GameObject paddle;
     private Rigidbody rb;
-    public Vector3 ballOffset = new Vector3(0, 0.5f, 0);
     public bool serve = false;
-    //private PaddleSpeed paddleSpeed;
+
+    private Vector3 oldPos;
+    public Vector3 velocity;
+    public float magnitude;
 
     private void Start()
     {
+        //Physics.gravity = new Vector3(0, -9.8f, 0);
+        Physics.gravity = new Vector3(0, -5, 0);
+        Debug.Log(Physics.gravity);
         //Physics.gravity = new Vector3(0, -4f, 0);
         rb = GetComponent<Rigidbody>();
-        //paddleSpeed = paddle.GetComponentInChildren<PaddleSpeed>();
     }
 
     private void Update()
     {
-        if(paddle != null && serve
-            /*Input.GetKeyDown(KeyCode.Space)*/ 
-            /*Vector3.Distance(paddle.transform.position, transform.position) > 1*/)
+        if(paddle != null && serve)
         {
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
@@ -47,9 +49,26 @@ public class BallController : MonoBehaviour
 
     }
 
+    private void FixedUpdate()
+    {
+        if (paddle != null)
+        {
+            velocity = (paddle.transform.position - oldPos) / Time.fixedDeltaTime;
+            magnitude = velocity.magnitude;
+            oldPos = paddle.transform.position;
+        }
+    }
+
+    public float speedMultiplier = 5;
     private void OnCollisionEnter(Collision collision)
     {
-        //if (rb && collision.gameObject.name == "paddle")
+        if(collision.gameObject.name == Constants.RightHand && magnitude > 0.3f)
+        {
+            Debug.Log("Collision with paddle");
+            rb.velocity = velocity * speedMultiplier;
+        }
+
+        //if (collision.gameObject.name == "paddle")
         //{
         //    Vector3 dir = collision.relativeVelocity.normalized;
 
