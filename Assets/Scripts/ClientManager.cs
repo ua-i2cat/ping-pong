@@ -104,6 +104,19 @@ public class ClientManager : MonoBehaviour
         ProcessObjects();
     }
 
+    public int deviceIndex = 3;
+    private void FixedUpdate()
+    {
+        var device = SteamVR_Controller.Input(deviceIndex);
+        if (device != null && UnityEngine.XR.XRSettings.enabled)
+        {
+            Transform origin = GameObject.Find(Constants.RightHand).transform.Find("attach");
+            Vector3 velocity = origin.TransformVector(device.velocity);
+            Debug.DrawLine(origin.position, origin.position + velocity, Color.black);
+            Debug.DrawLine(origin.position, origin.position + device.velocity, Color.red);
+        }
+    }
+
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -127,7 +140,7 @@ public class ClientManager : MonoBehaviour
 
     private void OnTriggerClicked(object sender, ClickedEventArgs e)
     {
-        Debug.Log("Trigger Pressed");
+        //Debug.Log("Trigger Pressed");
         // When the server interprets this packet, the ball is served to the client that made the request
         Packet packet = PacketBuilder.Build(Packet.PacketType.Text, Constants.ServeRequest);
         packet.Send(socket, new AsyncCallback(SendCallback));
@@ -147,11 +160,11 @@ public class ClientManager : MonoBehaviour
                 {
                     // Body controlled by keyboard
                     if(oponent.TransCount == 1)
-                        obj = Instantiate(Resources.Load("NewAvatar/AvatarNoCam")) as GameObject;
+                        obj = Instantiate(Resources.Load("Avatar/AvatarNoCam")) as GameObject;
 
                     // Body controlled by VR sensors
                     if (oponent.TransCount > 1)
-                        obj = Instantiate(Resources.Load("NewAvatar/AvatarVRNoCam")) as GameObject;
+                        obj = Instantiate(Resources.Load("Avatar/AvatarVRNoCam")) as GameObject;
 
                     obj.transform.parent = this.transform;
                     obj.name = "Client (" + oponent.Id + ")";
@@ -227,7 +240,7 @@ public class ClientManager : MonoBehaviour
     {
         Disconnect();
 
-        // Make sure the deregister the events to avoid Memory Leaks!!
+        // Make sure to deregister the events to avoid Memory Leaks!!
         if(inputController != null)
         {
             inputController.TriggerClicked -= OnTriggerClicked;
