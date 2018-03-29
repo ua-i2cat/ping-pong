@@ -5,41 +5,58 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
-public class AvatarBody : MonoBehaviour
+namespace avatar
 {
-    private Animator animator;
-    private Action<Animator> onIKAction;
+    [RequireComponent(typeof(Animator))]
+    public class AvatarBody : MonoBehaviour
+    {
+        private Animator animator;
+        private Action<Animator> IKAction = null;
 
-    private void Awake()
-    {
-        animator = GetComponent<Animator>();
-    }
+        public bool isColliding = false;
 
-    public Transform GetBodyEye()
-    {
-        return transform.Find("Eye");
-    }
-
-    public void Translate(Vector3 v)
-    {
-        transform.Translate(v);
-    }
-    public void Rotate(Vector3 euler)
-    {
-        transform.Rotate(euler);
-    }
-
-    public void SetIKAction(Action<Animator> onIKAction)
-    {
-        Debug.Log("Setting IK Action");
-        this.onIKAction = onIKAction;
-    }
-    private void OnAnimatorIK(int layerIndex)
-    {
-        if(onIKAction != null)
+        private void Awake()
         {
-            onIKAction(animator);
+            animator = GetComponent<Animator>();
+        }
+
+        public void Translate(Vector3 v)
+        {
+            transform.Translate(v);
+        }
+
+        public void Rotate(Vector3 euler)
+        {
+            transform.Rotate(euler);
+        }
+        
+        public void SetIK(Action<Animator> IKAction)
+        {
+            this.IKAction = IKAction;
+        }
+
+        private void OnAnimatorIK(int layerIndex)
+        {
+            if (this.IKAction != null)
+                IKAction(animator);
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            Vector3 v = new Vector3(collision.contacts[0].point.x, 0, collision.contacts[0].point.z) - transform.position;
+            transform.position -= v.normalized * 0.1f;
+            isColliding = true;
+        }
+
+        // In case the player stays stuck
+        private void OnCollisionStay(Collision collision)
+        {
+            isColliding = false;
+        }
+
+        private void OnCollisionExit(Collision collision)
+        {
+            isColliding = false;
         }
     }
 }

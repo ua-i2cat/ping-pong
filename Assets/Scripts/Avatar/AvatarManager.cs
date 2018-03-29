@@ -4,25 +4,24 @@
 
 using UnityEngine;
 
-public class AvatarManager : MonoBehaviour
+namespace avatar
 {
-    public AvatarControllerType controllerType;
-    private AvatarController controller;
-
-    [SerializeField]
-    private AvatarBody body;
-
-    private void Start()
+    public class AvatarManager : MonoBehaviour
     {
-        // Create AvatarController from the controllerType
-        controller = AvatarControllerFactory.Create(controllerType, body);
-    }
+        public AvatarBody body;
+        public AvatarController controller;
+        public AvatarControllerType type;
+        public int minimumSensors = 3;
+        public bool isClient;
 
-    private void Update()
-    {
-        controller.Update();
-    }
+        private void Start()
+        {
+            controller = AvatarFactory.Create(type, body, isClient, minimumSensors);
+        }
 
-    public AvatarRig ControllerRig { get { return controller.Rig; } }
-    public AvatarBody Body { get { return body; } }
+        private void Update()
+        {
+            controller.Update();
+        }
+    }
 }

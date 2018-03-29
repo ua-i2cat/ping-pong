@@ -26,7 +26,7 @@ namespace avatar
 
         public override void Update()
         {
-            //throw new System.NotImplementedException();
+            throw new System.NotImplementedException();
         }
     }
 }
