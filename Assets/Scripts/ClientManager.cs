@@ -110,10 +110,17 @@ public class ClientManager : MonoBehaviour
         var device = SteamVR_Controller.Input(deviceIndex);
         if (device != null && UnityEngine.XR.XRSettings.enabled)
         {
-            Transform origin = GameObject.Find(Constants.RightHand).transform.Find("attach");
-            Vector3 velocity = origin.TransformVector(device.velocity);
-            Debug.DrawLine(origin.position, origin.position + velocity, Color.black);
-            Debug.DrawLine(origin.position, origin.position + device.velocity, Color.red);
+            try
+            {
+                Transform origin = GameObject.Find(Constants.RightHand).transform.Find("attach");
+                Vector3 velocity = origin.TransformVector(device.velocity);
+                Debug.DrawLine(origin.position, origin.position + velocity, Color.black);
+                Debug.DrawLine(origin.position, origin.position + device.velocity, Color.red);
+            }
+            catch
+            {
+
+            }
         }
     }
 

@@ -18,11 +18,12 @@ public class BallController : MonoBehaviour
     {
         //Physics.gravity = new Vector3(0, -9.8f, 0);
         Physics.gravity = new Vector3(0, -5, 0);
-        Debug.Log(Physics.gravity);
+        Debug.Log("Gravity: " + Physics.gravity);
         //Physics.gravity = new Vector3(0, -4f, 0);
         rb = GetComponent<Rigidbody>();
     }
 
+    public float forceMagnitude = 100; //800;
     private void Update()
     {
         if(paddle != null && serve)
@@ -31,12 +32,15 @@ public class BallController : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             transform.rotation = Quaternion.identity;
             Vector3 paddlePos = paddle.transform.position;
-            Vector3 paddleBase = paddle.GetComponent<BoxCollider>().center;
-            Debug.DrawLine(paddlePos, paddlePos + paddle.transform.forward * 0.2f, Color.red, 10);
-            Debug.DrawLine(paddlePos + paddle.transform.forward * 0.2f,
-                paddlePos + paddle.transform.forward * 0.2f + paddle.transform.up * 0.5f,
-                Color.blue, 10);
-            transform.position = paddlePos + paddle.transform.forward * 0.2f + Vector3.up * 0.5f;           
+            //Debug.DrawLine(paddlePos, paddlePos + paddle.transform.forward * 0.2f, Color.red, 10);
+            //Debug.DrawLine(paddlePos + paddle.transform.forward * 0.2f,
+            //    paddlePos + paddle.transform.forward * 0.2f + paddle.transform.up * 0.5f,
+            //    Color.blue, 10);
+
+            transform.position = paddlePos + paddle.transform.forward * 0.2f + paddle.transform.up * 0.3f;
+            Debug.DrawLine(paddlePos + paddle.transform.forward * 0.2f, transform.position, Color.green, 10);
+
+            rb.AddForce((paddlePos + paddle.transform.forward * 0.2f - transform.position).normalized * forceMagnitude);
 
             serve = false;
         }
@@ -60,8 +64,24 @@ public class BallController : MonoBehaviour
     }
 
     public float speedMultiplier = 5;
+    public float collisionForce = 5;
     private void OnCollisionEnter(Collision collision)
     {
+        //Debug.Log("Collision with " + collision.gameObject.name);
+        if(collision.gameObject.name == Constants.RightHand)
+        {
+            Debug.Log("Impulse " + collision.impulse);
+
+            Vector3 dir = collision.contacts[0].point - transform.position;
+            dir = -dir.normalized;
+
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.AddForce(dir * collisionForce);
+            Debug.Log(dir * collisionForce);
+            Debug.DrawLine(transform.position, collision.contacts[0].point * 100, Color.black, 10);
+        }
+
         if(collision.gameObject.name == Constants.RightHand && magnitude > 0.3f)
         {
             Debug.Log("Collision with paddle");

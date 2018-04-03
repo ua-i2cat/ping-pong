@@ -44,6 +44,7 @@ public class ServerManager : MonoBehaviour
         listener.BeginAcceptSocket(new AsyncCallback(AcceptCallback), null);
         Debug.Log("Server listening on port " + Constants.PORT);
 
+        // Fetch the ball controller from the scene
         ballController = GameObject.Find("Ball").GetComponent<BallController>();
     }
 
