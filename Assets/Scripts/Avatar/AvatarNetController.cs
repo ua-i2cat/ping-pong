@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace avatar
+namespace AvatarSystem
 {
     public class AvatarNetController : AvatarController
     {

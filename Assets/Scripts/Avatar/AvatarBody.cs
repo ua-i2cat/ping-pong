@@ -5,7 +5,7 @@
 using System;
 using UnityEngine;
 
-namespace avatar
+namespace AvatarSystem
 {
     [RequireComponent(typeof(Animator))]
     public class AvatarBody : MonoBehaviour
@@ -41,6 +41,7 @@ namespace avatar
                 IKAction(animator);
         }
 
+        // Move the body back a little on collision
         private void OnCollisionEnter(Collision collision)
         {
             Vector3 v = new Vector3(collision.contacts[0].point.x, 0, collision.contacts[0].point.z) - transform.position;

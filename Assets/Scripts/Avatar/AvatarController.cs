@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace avatar
+namespace AvatarSystem
 {
     public enum AvatarControllerType
     {
@@ -17,7 +17,6 @@ namespace avatar
     public abstract class AvatarController
     {
         protected AvatarBody body;
-        //protected AvatarRig rig;
 
         protected AvatarControllerType type;
 

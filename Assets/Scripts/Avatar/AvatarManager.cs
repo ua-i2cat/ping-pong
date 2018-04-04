@@ -4,14 +4,14 @@
 
 using UnityEngine;
 
-namespace avatar
+namespace AvatarSystem
 {
     public class AvatarManager : MonoBehaviour
     {
         public AvatarBody body;
-        public AvatarController controller;
+        private AvatarController controller;
         public AvatarControllerType type;
-        public int minimumSensors = 3;
+        public int minimumSensors = 3;      // 6 for full-body tracking
         public bool isClient;
 
         private void Start()
@@ -22,6 +22,11 @@ namespace avatar
         private void Update()
         {
             controller.Update();
+        }
+
+        public AvatarController GetController()
+        {
+            return controller;
         }
     }
 }

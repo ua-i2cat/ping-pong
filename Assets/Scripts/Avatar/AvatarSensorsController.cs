@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace avatar
+namespace AvatarSystem
 {
     public class AvatarSensorsController : AvatarController
     {
