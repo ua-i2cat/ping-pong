@@ -70,8 +70,21 @@ public class Trans
         return data;
     }
 
-    public static Trans Deserialize(List<byte> data)
+    public static Trans Deserialize(byte[] data, ref int dataIndex)
     {
-        throw new NotImplementedException();
+        string name = Encoding.ASCII.GetString(data, dataIndex, 4); dataIndex += 4;
+
+        float x = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+        float y = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+        float z = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+
+        float qx = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+        float qy = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+        float qz = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+        float qw = BitConverter.ToSingle(data, dataIndex); dataIndex += 4;
+
+        Vector3 pos = new Vector3(x, y, z);
+        Quaternion rot = new Quaternion(qx, qy, qz, qw);
+        return new Trans(pos, rot, name);
     }
 }
