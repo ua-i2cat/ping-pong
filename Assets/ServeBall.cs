@@ -23,7 +23,7 @@ public class ServeBall : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var rb = this.gameObject.transform.Find("attach").Find("Collider").GetComponent<Rigidbody>();
+        //var rb = this.gameObject.transform.Find("attach").Find("Collider").GetComponent<Rigidbody>();
         //Debug.Log(rb.velocity);
     }
 }

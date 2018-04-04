@@ -7,6 +7,10 @@ public static class Constants
     public static string IP = "147.83.206.67";
     public static int PORT = 33333;
 
+    public static int BUFF_SIZE = 8192;
+
+    public static int HEADER_SIZE = 3;
+
     public static string Body = "Body";
     public static string Rig = "Rig";
     public static string Eye = "Eye";
@@ -17,4 +21,12 @@ public static class Constants
     public static string RightFoot = "RF";
 
     public static string ServeRequest = "ServeRequest";
+    public static string WelcomeMsg = "Welcome\n";
+
+    public static string OnlineText = "Online";
+    public static string OfflineText = "Offline";
+
+    public static string SendInputField = "SendInputField";
+
+    public static string Ball = "Ball";
 }

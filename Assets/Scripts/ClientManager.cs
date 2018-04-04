@@ -12,6 +12,8 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
+using AvatarSystem;
+
 public class ClientManager : MonoBehaviour
 {
     private Socket socket;
@@ -20,8 +22,7 @@ public class ClientManager : MonoBehaviour
     private string ip = Constants.IP;
     private int port = Constants.PORT;
 
-    private const int BUFF_SIZE = 8192;
-    private byte[] recvBuffer = new byte[BUFF_SIZE];
+    private byte[] recvBuffer = new byte[Constants.BUFF_SIZE];
 
     private int packetRate = 60;
 
@@ -33,7 +34,7 @@ public class ClientManager : MonoBehaviour
     private Trans spawn;
 
     // The avatar of the client itself
-    public avatar.AvatarManager avatar;
+    public AvatarManager avatar;
 
     // List of other connected clients
     private Oponents oponents = new Oponents();
@@ -81,7 +82,7 @@ public class ClientManager : MonoBehaviour
         {
             connecting = false;
 
-            List<Trans> transforms = avatar.controller.GetTransforms();
+            List<Trans> transforms = avatar.GetController().GetTransforms();
             Packet packet = PacketBuilder.Build(Packet.PacketType.Sensors, transforms);
             packet.Send(socket, new AsyncCallback(SendCallback));
         }
@@ -96,7 +97,7 @@ public class ClientManager : MonoBehaviour
             // Move Body and Rig? to the position and rotation received
             //avatarManager.Body.transform.position = spawn.Pos;
             //avatarManager.Body.transform.rotation = spawn.Rot;
-            avatar.controller.SetTransforms(new List<Trans>() { spawn });
+            avatar.GetController().SetTransforms(new List<Trans>() { spawn });
             justSpawned = false;
         }
 
@@ -161,7 +162,6 @@ public class ClientManager : MonoBehaviour
             if (oponent.TransCount > 0)
             {
                 Trans t = oponent.GetTrans(0);
-                //GameObject obj = GameObject.Find(oponent.Id + " - " + t.Id);
                 GameObject obj = GameObject.Find("Client (" + oponent.Id + ")");
                 if (obj == null)
                 {
@@ -233,12 +233,12 @@ public class ClientManager : MonoBehaviour
 
         if (socket.Connected)
         {
-            onlineTxt.text = "Online";
+            onlineTxt.text = Constants.OnlineText;
             onlineTxt.color = Color.green;
         }
         else
         {
-            onlineTxt.text = "Offline";
+            onlineTxt.text = Constants.OfflineText;
             onlineTxt.color = Color.red;
         }
     }
@@ -263,8 +263,8 @@ public class ClientManager : MonoBehaviour
             socket.EndConnect(AR);
             socket.NoDelay = true;
             socket.DontFragment = true;
-            socket.ReceiveBufferSize = BUFF_SIZE;
-            socket.SendBufferSize = BUFF_SIZE;
+            socket.ReceiveBufferSize = Constants.BUFF_SIZE;
+            socket.SendBufferSize = Constants.BUFF_SIZE;
             Debug.Log("Connection established");
             connecting = false;
 
@@ -410,7 +410,7 @@ public class ClientManager : MonoBehaviour
 
     public void OnSendBtn_Click()
     {
-        GameObject sendText = GameObject.Find("SendInputField");
+        GameObject sendText = GameObject.Find(Constants.SendInputField);
         Debug.Assert(sendText != null);
         string text = sendText.GetComponent<InputField>().text;
         Debug.Log("[C->S]: " + text);

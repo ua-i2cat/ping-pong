@@ -46,13 +46,14 @@ public class Packet
         switch (Type)
         {
             case Packet.PacketType.Text:
-                content = Encoding.ASCII.GetString(data.ToArray(), 3, data.Count - 3);
+                content = Encoding.ASCII.GetString(data.ToArray(), Constants.HEADER_SIZE, 
+                    data.Count - Constants.HEADER_SIZE);
                 break;
 
             case Packet.PacketType.Spawn:
-                float x = BitConverter.ToSingle(data.ToArray(), 3 + 0);
-                float y = BitConverter.ToSingle(data.ToArray(), 3 + 4);
-                float z = BitConverter.ToSingle(data.ToArray(), 3 + 8);
+                float x = BitConverter.ToSingle(data.ToArray(), Constants.HEADER_SIZE + 0);
+                float y = BitConverter.ToSingle(data.ToArray(), Constants.HEADER_SIZE + 4);
+                float z = BitConverter.ToSingle(data.ToArray(), Constants.HEADER_SIZE + 8);
                 content = new Vector3(x, y, z);
                 break;
         }
@@ -88,7 +89,8 @@ public class PacketText
     {
         get
         {
-            return Encoding.ASCII.GetString(p.ToArray(), 3, p.Size - 3);
+            return Encoding.ASCII.GetString(p.ToArray(), Constants.HEADER_SIZE, 
+                p.Size - Constants.HEADER_SIZE);
         }
     }
 }
@@ -113,25 +115,13 @@ public class PacketSensors
         {
             List<Trans> data = new List<Trans>();
 
-            int dataIndex = 3;
+            int dataIndex = Constants.HEADER_SIZE;
             int transformCount = p.ToArray()[dataIndex++];
 
             for(int i = 0; i < transformCount; i++)
             {
-                string name = Encoding.ASCII.GetString(p.ToArray(), dataIndex, 4); dataIndex += 4;
-
-                float x = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float y = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float z = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-                float qx = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float qy = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float qz = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float qw = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-                Vector3 pos = new Vector3(x, y, z);
-                Quaternion rot = new Quaternion(qx, qy, qz, qw);
-                data.Add(new Trans(pos, rot, name));
+                Trans t = Trans.Deserialize(p.ToArray(), ref dataIndex);
+                data.Add(t);
             }
 
             return data;
@@ -157,21 +147,8 @@ public class PacketSpawn
     {
         get
         {
-            int dataIndex = 3;
-            string name = Encoding.ASCII.GetString(p.ToArray(), dataIndex, 4); dataIndex += 4;
-
-            float x = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-            float y = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-            float z = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-            float qx = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-            float qy = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-            float qz = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-            float qw = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-            Vector3 pos = new Vector3(x, y, z);
-            Quaternion rot = new Quaternion(qx, qy, qz, qw);
-            Trans t = new Trans(pos, rot, name);
+            int dataIndex = Constants.HEADER_SIZE;
+            Trans t = Trans.Deserialize(p.ToArray(), ref dataIndex);
             return t;
         }
     }
@@ -197,7 +174,7 @@ public class PacketOtherClients
         {
             List<Oponent> clients = new List<Oponent>();
 
-            int dataIndex = 3;
+            int dataIndex = Constants.HEADER_SIZE;
             int clientCount = p.ToArray()[dataIndex++];
             for(int i = 0; i < clientCount; i++)
             {
@@ -206,20 +183,7 @@ public class PacketOtherClients
                 int transformCount = p.ToArray()[dataIndex++];
                 for(int j = 0; j < transformCount; j++)
                 {
-                    string name = Encoding.ASCII.GetString(p.ToArray(), dataIndex, 4); dataIndex += 4;
-
-                    float x = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                    float y = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                    float z = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-                    float qx = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                    float qy = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                    float qz = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                    float qw = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-                    Vector3 pos = new Vector3(x, y, z);
-                    Quaternion rot = new Quaternion(qx, qy, qz, qw);
-                    Trans t = new Trans(pos, rot, name);
+                    Trans t = Trans.Deserialize(p.ToArray(), ref dataIndex);
                     oponent.AddTransform(t);
                 }
                 clients.Add(oponent);
@@ -250,25 +214,12 @@ public class PacketObjects
         {
             List<Trans> objects = new List<Trans>();
 
-            int dataIndex = 3;
+            int dataIndex = Constants.HEADER_SIZE;
             int objCount = p.ToArray()[dataIndex++];
             for (int i = 0; i < objCount; i++)
             {
-                string name = Encoding.ASCII.GetString(p.ToArray(), dataIndex, 4); dataIndex += 4;
-
-                float x = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float y = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float z = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-                float qx = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float qy = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float qz = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-                float qw = BitConverter.ToSingle(p.ToArray(), dataIndex); dataIndex += 4;
-
-                Vector3 pos = new Vector3(x, y, z);
-                Quaternion rot = new Quaternion(qx, qy, qz, qw);
-
-                objects.Add(new Trans(pos, rot, name));
+                Trans t = Trans.Deserialize(p.ToArray(), ref dataIndex);
+                objects.Add(t);
             }
 
             return objects;

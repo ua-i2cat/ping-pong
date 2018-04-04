@@ -82,11 +82,11 @@ public class BallController : MonoBehaviour
             Debug.DrawLine(transform.position, collision.contacts[0].point * 100, Color.black, 10);
         }
 
-        if(collision.gameObject.name == Constants.RightHand && magnitude > 0.3f)
-        {
-            Debug.Log("Collision with paddle");
-            rb.velocity = velocity * speedMultiplier;
-        }
+        //if(collision.gameObject.name == Constants.RightHand && magnitude > 0.3f)
+        //{
+        //    Debug.Log("Collision with paddle");
+        //    rb.velocity = velocity * speedMultiplier;
+        //}
 
         //if (collision.gameObject.name == "paddle")
         //{

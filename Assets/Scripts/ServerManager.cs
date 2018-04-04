@@ -45,7 +45,7 @@ public class ServerManager : MonoBehaviour
         Debug.Log("Server listening on port " + Constants.PORT);
 
         // Fetch the ball controller from the scene
-        ballController = GameObject.Find("Ball").GetComponent<BallController>();
+        ballController = GameObject.Find(Constants.Ball).GetComponent<BallController>();
     }
 
     private void Update()
@@ -110,11 +110,11 @@ public class ServerManager : MonoBehaviour
                         if (key.Contains(Constants.RightHand))
                         {
                             // @TODO: Create a prefab for this! Hardcoded collider for now.
-                            obj = new GameObject("RH");
+                            obj = new GameObject(Constants.RightHand);
                             obj.transform.localScale = new Vector3(0.11692f, 0.11692f, 0.11692f);
                             var collider = obj.AddComponent<BoxCollider>();
-                            collider.center = new Vector3(0, 0, 1.2f);
-                            collider.size = new Vector3(1.5f, 0.15f, 2.5f);
+                            collider.center = new Vector3(0, -0.15f, 1);
+                            collider.size = new Vector3(2, 0.5f, 3);
                         }
                         else
                         {
@@ -203,7 +203,7 @@ public class ServerManager : MonoBehaviour
                 clients.Add(client);
 
                 // Begin sending data
-                Packet packet = PacketBuilder.Build(Packet.PacketType.Text, "Welcome\n");
+                Packet packet = PacketBuilder.Build(Packet.PacketType.Text, Constants.WelcomeMsg);
                 packet.Send(socket, new AsyncCallback(SendCallback));
 
                 Trans spawn = spawnTrans[(clients.Count - 1) % spawnTrans.Count];
@@ -330,7 +330,7 @@ public class ServerManager : MonoBehaviour
     public void OnSendBtn_Click()
     {
         // Get text in the input field and build a packet with it
-        GameObject sendText = GameObject.Find("SendInputField");
+        GameObject sendText = GameObject.Find(Constants.SendInputField);
         string text = sendText.GetComponent<InputField>().text;
         Packet packet = PacketBuilder.Build(Packet.PacketType.Text, text);
 

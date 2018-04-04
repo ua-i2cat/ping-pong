@@ -33,7 +33,7 @@ public static class PacketBuilder
 
     private static IEnumerable<byte> GetPacketSize(Packet.PacketType type, object data = null)
     {
-        int size = 2 + 1; // 2 bytes for the size + 1 byte for the type
+        int size = Constants.HEADER_SIZE; // 2 bytes for the size + 1 byte for the type
 
         switch (type)
         {
