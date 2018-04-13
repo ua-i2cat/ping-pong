@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -79,6 +80,94 @@ public class ClientData
         List<byte> data = new List<byte>();
         data.AddRange(BitConverter.GetBytes(socket.GetHashCode())); // Client id
         data.Add((byte)transforms.Count);                           // Transform Count
+        if (instance == null)
+        {
+            Debug.LogWarning("Null instance in Serialize");
+            return new List<byte>();
+        }
+        foreach (Transform t in instance.transform /*transforms*/)
+            //data.AddRange(t.Value.Serialize());
+            data.AddRange(new Trans(t.position, t.rotation, t.name).Serialize());
+        return data;
+    }
+}
+
+public class ClientDataUDP
+{
+    public IPEndPoint endPoint;
+    public Trans spawn;
+    public int TTL = 100;
+
+    private GameObject instance;
+
+    public ClientDataUDP(IPEndPoint ep)
+    {
+        endPoint = ep;
+    }
+
+    public void Update(List<Trans> transforms)
+    {
+        // Instantiate if a client is connected and doesn't have an instance yet
+        if (instance == null && transforms.Count > 0)
+        {
+            instance = new GameObject(endPoint.ToString());
+            foreach (Trans t in transforms)
+            {
+                GameObject obj;
+                if (t.Id.Contains(Constants.RightHand))
+                {
+                    // @TODO: Create a prefab for this! Hardcoded collider for now.
+                    obj = new GameObject(Constants.RightHand);
+                    obj.transform.localScale = Constants.RightHandScale;
+                    var collider = obj.AddComponent<BoxCollider>();
+                    collider.center = Constants.ColliderCenter;
+                    collider.size = Constants.ColliderSize;
+                }
+                else
+                {
+                    obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    GameObject.Destroy(obj.GetComponent<SphereCollider>());
+                    obj.transform.localScale = Constants.SphereScale;
+                }
+                obj.name = t.Id;
+                obj.transform.parent = instance.transform;
+                obj.transform.position = t.Pos;
+                obj.transform.rotation = t.Rot;
+            }
+        }
+        // Update already instanced clients
+        else if (instance != null && transforms.Count > 0)
+        {
+            foreach (Trans t in transforms)
+            {
+                Transform current = instance.transform.Find(t.Id);
+                if (current != null)
+                {
+                    current.position = t.Pos;
+                    current.rotation = t.Rot;
+                }
+            }
+        }
+    }
+
+    public void Destroy()
+    {
+        if (instance != null && TTL < 0)
+        {
+            GameObject.Destroy(instance);
+        }
+    }
+
+    public int TransformCount
+    {
+        get { return instance.transform.childCount; }
+    }
+
+    public List<byte> Serialize()
+    {
+        List<byte> data = new List<byte>();
+        data.AddRange(BitConverter.GetBytes(endPoint.GetHashCode())); // Client id
+        data.Add((byte)TransformCount);                           // Transform Count
         if (instance == null)
         {
             Debug.LogWarning("Null instance in Serialize");
