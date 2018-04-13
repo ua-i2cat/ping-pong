@@ -11,7 +11,7 @@ public class NetBenchmarks
 
     public NetBenchmarks()
     {
-        this.sendTimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+        this.sendTimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
         this.recvTimeStamp = -1;
     }
 

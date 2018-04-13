@@ -382,7 +382,7 @@ public class ClientManager : MonoBehaviour
 
                 case Packet.PacketType.Benchmark:
                     NetBenchmarks b = ((PacketBenchmark)packet).Data;
-                    b.recvTimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    b.recvTimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
                     PacketBuilder.Build(Packet.PacketType.Benchmark, b).Send(socket, new AsyncCallback(SendCallback));
                     break;
 
