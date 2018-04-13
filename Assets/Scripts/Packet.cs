@@ -3,6 +3,7 @@
 // Author: alexandre.via@i2cat.net
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -45,12 +46,12 @@ public class Packet
         object content = null;
         switch (Type)
         {
-            case Packet.PacketType.Text:
+            case PacketType.Text:
                 content = Encoding.ASCII.GetString(data.ToArray(), Constants.HEADER_SIZE, 
                     data.Count - Constants.HEADER_SIZE);
                 break;
 
-            case Packet.PacketType.Spawn:
+            case PacketType.Spawn:
                 float x = BitConverter.ToSingle(data.ToArray(), Constants.HEADER_SIZE + 0);
                 float y = BitConverter.ToSingle(data.ToArray(), Constants.HEADER_SIZE + 4);
                 float z = BitConverter.ToSingle(data.ToArray(), Constants.HEADER_SIZE + 8);
