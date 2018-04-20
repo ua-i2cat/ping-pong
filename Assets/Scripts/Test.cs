@@ -248,9 +248,6 @@ public class Test : MonoBehaviour
     {
         ClientTestTCP client = new ClientTestTCP();
         client.Start("45.58.13.77", 15779);
-
-        var ip = Dns.GetHostEntry("gwgt1.joymax.com").AddressList[0];
-        Debug.Log(ip);
     }
 
     private static System.Random random = new System.Random();

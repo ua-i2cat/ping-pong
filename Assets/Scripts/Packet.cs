@@ -33,6 +33,8 @@ public class Packet
     {
         this.data = data;
         Debug.Assert(Size == BitConverter.ToInt16(data.ToArray(), 0), "Incorrect Packet format. Check size of data");
+        if(Size != BitConverter.ToInt16(data.ToArray(), 0))
+            Debug.Log("Size: " + Size + "  HeaderSize: " + BitConverter.ToInt16(data.ToArray(), 0));
     }
 
     public short Size { get { return (short)data.Count; } }

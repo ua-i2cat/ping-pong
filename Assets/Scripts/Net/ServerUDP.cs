@@ -21,6 +21,7 @@ public class ServerUDP : Server
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         socket.Blocking = false;
         socket.Bind(new IPEndPoint(IPAddress.Any, port));
+        Debug.Log("[Server] Socket Listening");
 
         serverThread = new Thread(new ThreadStart(ServerLoop));
         serverThread.Start();
@@ -29,7 +30,8 @@ public class ServerUDP : Server
     public override void Stop()
     {
         Interlocked.Decrement(ref run);
-        serverThread.Join();
+        if(serverThread != null)
+            serverThread.Join();
     }
 
     public override void Send(EndPoint client, byte[] buffer, int len)
@@ -55,21 +57,29 @@ public class ServerUDP : Server
                 while (socket.Available > 0)
                 {
                     EndPoint client = new IPEndPoint(IPAddress.Any, 0);
-                    int bytesRecv = socket.ReceiveFrom(data, ref client);
-                    //Debug.Log("Received " + bytesRecv + " bytes from " + client.ToString());
-                    OnRecv(new ServerMsgEventArgs(client, data, bytesRecv));
+                    try
+                    {
+                        int bytesRecv = socket.ReceiveFrom(data, ref client);
+                        //Debug.Log("Received " + bytesRecv + " bytes from " + client.ToString());
+                        OnRecv(new ServerMsgEventArgs(client, data, bytesRecv));
+                    }
+                    catch
+                    {
+                        //Debug.Log("Exception on receive but continuing ServerLoop. Available: " + socket.Available);
+                        break;
+                    }
                 }
 
                 Thread.Sleep(1);
             }
+
+            Debug.Log("[Server] Closing socket");
+            socket.Close();
         }
         catch(Exception e)
         {
             Debug.Log(e);
             Debug.Log("Exception in ServerLoop!!");
         }
-
-        Debug.Log("[Server] Closing socket");
-        socket.Close();
     }
 }

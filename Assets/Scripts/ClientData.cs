@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using UnityEngine;
 
 public class ClientData
@@ -105,54 +106,68 @@ public class ClientDataUDP
         endPoint = ep;
     }
 
+    private int hasTransforms = 0;
+    private List<Trans> transforms;
+    public void Update()
+    {
+        if(hasTransforms > 0 && transforms != null)
+        {
+            // Instantiate if a client is connected and doesn't have an instance yet
+            if (instance == null && transforms.Count > 0)
+            {
+                instance = new GameObject(endPoint.ToString());
+                foreach (Trans t in transforms)
+                {
+                    GameObject obj;
+                    if (t.Id.Contains(Constants.RightHand))
+                    {
+                        // @TODO: Create a prefab for this! Hardcoded collider for now.
+                        obj = new GameObject(Constants.RightHand);
+                        obj.transform.localScale = Constants.RightHandScale;
+                        var collider = obj.AddComponent<BoxCollider>();
+                        collider.center = Constants.ColliderCenter;
+                        collider.size = Constants.ColliderSize;
+                    }
+                    else
+                    {
+                        obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                        GameObject.Destroy(obj.GetComponent<SphereCollider>());
+                        obj.transform.localScale = Constants.SphereScale;
+                    }
+                    obj.name = t.Id;
+                    obj.transform.parent = instance.transform;
+                    obj.transform.position = t.Pos;
+                    obj.transform.rotation = t.Rot;
+                }
+            }
+            // Update already instanced clients
+            else if (instance != null && transforms.Count > 0)
+            {
+                foreach (Trans t in transforms)
+                {
+                    Transform current = instance.transform.Find(t.Id);
+                    if (current != null)
+                    {
+                        current.position = t.Pos;
+                        current.rotation = t.Rot;
+                    }
+                }
+            }
+
+            Interlocked.Decrement(ref hasTransforms);
+        }
+    }
+
     public void Update(List<Trans> transforms)
     {
-        // Instantiate if a client is connected and doesn't have an instance yet
-        if (instance == null && transforms.Count > 0)
-        {
-            instance = new GameObject(endPoint.ToString());
-            foreach (Trans t in transforms)
-            {
-                GameObject obj;
-                if (t.Id.Contains(Constants.RightHand))
-                {
-                    // @TODO: Create a prefab for this! Hardcoded collider for now.
-                    obj = new GameObject(Constants.RightHand);
-                    obj.transform.localScale = Constants.RightHandScale;
-                    var collider = obj.AddComponent<BoxCollider>();
-                    collider.center = Constants.ColliderCenter;
-                    collider.size = Constants.ColliderSize;
-                }
-                else
-                {
-                    obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    GameObject.Destroy(obj.GetComponent<SphereCollider>());
-                    obj.transform.localScale = Constants.SphereScale;
-                }
-                obj.name = t.Id;
-                obj.transform.parent = instance.transform;
-                obj.transform.position = t.Pos;
-                obj.transform.rotation = t.Rot;
-            }
-        }
-        // Update already instanced clients
-        else if (instance != null && transforms.Count > 0)
-        {
-            foreach (Trans t in transforms)
-            {
-                Transform current = instance.transform.Find(t.Id);
-                if (current != null)
-                {
-                    current.position = t.Pos;
-                    current.rotation = t.Rot;
-                }
-            }
-        }
+        this.transforms = transforms;
+        if (hasTransforms <= 0)
+            Interlocked.Increment(ref hasTransforms);
     }
 
     public void Destroy()
     {
-        if (instance != null && TTL < 0)
+        if (instance != null/* && TTL == 0*/)
         {
             GameObject.Destroy(instance);
         }
@@ -160,7 +175,13 @@ public class ClientDataUDP
 
     public int TransformCount
     {
-        get { return instance.transform.childCount; }
+        get
+        {
+            if(instance != null)
+                return instance.transform.childCount;
+
+            return 0;
+        }
     }
 
     public List<byte> Serialize()

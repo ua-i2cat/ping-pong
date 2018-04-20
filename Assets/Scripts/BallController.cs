@@ -18,7 +18,7 @@ public class BallController : MonoBehaviour
     {
         //Physics.gravity = new Vector3(0, -9.8f, 0);
         Physics.gravity = new Vector3(0, -5, 0);
-        Debug.Log("Gravity: " + Physics.gravity);
+        //Debug.Log("Gravity: " + Physics.gravity);
         //Physics.gravity = new Vector3(0, -4f, 0);
         rb = GetComponent<Rigidbody>();
     }

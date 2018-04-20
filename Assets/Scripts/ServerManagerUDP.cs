@@ -3,12 +3,10 @@
 // Author: alexandre.via@i2cat.net
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,7 +27,7 @@ public class ServerManagerUDP : MonoBehaviour
 
     public bool benchmarkEnabled = false;
 
-    private void Awake()
+    private void Start()
     {
         // Fix the target framerate for standalone platforms
         Application.targetFrameRate = 60;

@@ -24,8 +24,6 @@ public class ClientManagerUDP : MonoBehaviour
     private int port = Constants.PORT;
     private EndPoint endPoint;
 
-    private byte[] recvBuffer = new byte[Constants.BUFF_SIZE];
-
     private int packetRate = 60;
 
     public bool Reconnect = true;
