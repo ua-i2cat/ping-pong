@@ -886,7 +886,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1527164180}
-  - component: {fileID: 1527164182}
   - component: {fileID: 1527164181}
   m_Layer: 0
   m_Name: ServerManager
@@ -920,24 +919,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 694a2ebfa3635c64784d9b7c37d023f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnTransforms:
-  - {fileID: 1518604324}
-  - {fileID: 891256535}
-  objectsToSend:
-  - {fileID: 284377188}
-  benchmarkEnabled: 0
-  enabled: 0
---- !u!114 &1527164182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1527164179}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aae4dcc4420ac794d82e694905a8dbe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   spawnTransforms:
@@ -1084,7 +1065,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1527164182}
+      - m_Target: {fileID: 1527164181}
         m_MethodName: OnSendBtn_Click
         m_Mode: 1
         m_Arguments:
