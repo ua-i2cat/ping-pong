@@ -887,6 +887,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1527164180}
   - component: {fileID: 1527164182}
+  - component: {fileID: 1527164181}
   m_Layer: 0
   m_Name: ServerManager
   m_TagString: Untagged
@@ -910,13 +911,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1527164182
+--- !u!114 &1527164181
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1527164179}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 694a2ebfa3635c64784d9b7c37d023f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnTransforms:
+  - {fileID: 1518604324}
+  - {fileID: 891256535}
+  objectsToSend:
+  - {fileID: 284377188}
+  benchmarkEnabled: 0
+  enabled: 0
+--- !u!114 &1527164182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1527164179}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aae4dcc4420ac794d82e694905a8dbe1, type: 3}
   m_Name: 
