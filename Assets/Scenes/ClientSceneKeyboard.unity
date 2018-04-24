@@ -326,10 +326,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 90335497}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1090ecf56bb49fb4ea0b2ca438a9efd4, type: 3}
+  m_Script: {fileID: 11500000, guid: 59a2b2cacb5b292449952a8a27dbae99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Reconnect: 0
+  protocol: 1
   avatar: {fileID: 980212586}
 --- !u!1 &225079245
 GameObject:
