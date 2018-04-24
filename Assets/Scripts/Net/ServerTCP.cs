@@ -13,7 +13,7 @@ using System.Net.Sockets;
 /// </summary>
 public class ServerTCP : Server
 {
-    // Contains the underlying socket used for listening incoming connections
+    // Contains the underlying socket used for listening and accepting incoming connections
     private TcpListener listener;
 
     // Map of the active connections with their receive buffer
@@ -32,7 +32,7 @@ public class ServerTCP : Server
     public override void Stop()
     {
         // Close the active connections
-        foreach(var pair in recvBuffers)
+        foreach (var pair in recvBuffers)
         {
             pair.Key.Close();
         }
@@ -50,14 +50,18 @@ public class ServerTCP : Server
         socket.BeginSend(buffer, 0, len, SocketFlags.None, new AsyncCallback(SendCallback), new Tuple<Socket, byte[]>(socket, buffer));
     }
 
-    // Executed when there is an incomming connection, override to add business logic
-    protected virtual void OnConnect(Socket socket)
+    // Executed when there is an incomming connection
+    public event ConnectEventHandler ClientConnect;
+    private void OnConnect(ConnectEventArgs e)
     {
+        ClientConnect?.Invoke(this, e);
     }
 
-    // Executed when a client is disconnected, override to add business logic
-    protected virtual void OnDisconnect(Socket socket)
+    // Executed when a client is disconnected
+    public event ConnectEventHandler ClientDisconnect;
+    private void OnDisconnect(ConnectEventArgs e)
     {
+        ClientDisconnect?.Invoke(this, e);
     }
 
     // Executed when there is an incomming connection
@@ -67,7 +71,7 @@ public class ServerTCP : Server
         {
             // Accept the connection
             Socket socket = listener.EndAcceptSocket(AR);
-            OnConnect(socket);
+            OnConnect(new ConnectEventArgs(socket));
 
             // Create a buffer and add it to the connection map
             recvBuffers.Add(socket, new byte[8192]);
@@ -102,7 +106,7 @@ public class ServerTCP : Server
         }
         catch
         {
-            OnDisconnect(socket);
+            OnDisconnect(new ConnectEventArgs(socket));
             throw new Exception("RecvCallback error");
         }
     }
@@ -121,5 +125,16 @@ public class ServerTCP : Server
             //Debug.Log("SendCallback error");
             throw new Exception("SendCallback error");
         }
+    }
+
+    public delegate void ConnectEventHandler(Object sender, ConnectEventArgs e);
+    public class ConnectEventArgs : EventArgs
+    {
+        public ConnectEventArgs(Socket s)
+        {
+            this.Socket = s;
+        }
+
+        public Socket Socket { get; set; }
     }
 }

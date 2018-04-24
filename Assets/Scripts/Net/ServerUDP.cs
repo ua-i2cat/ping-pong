@@ -11,24 +11,29 @@ using UnityEngine;
 public class ServerUDP : Server
 {
     private Socket socket;
-
     private Thread serverThread;
 
+    // Run flag, we use an int since booleans are not supported by Interlocked
     private int run = 1;
 
     public override void Start(int port)
     {
+        // Create non-blocking UDP socket
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         socket.Blocking = false;
+
+        // Bind socket to the port passed as argument
         socket.Bind(new IPEndPoint(IPAddress.Any, port));
         Debug.Log("[Server] Socket Listening");
 
+        // Start ServerLoop in a new thread
         serverThread = new Thread(new ThreadStart(ServerLoop));
         serverThread.Start();
     }
 
     public override void Stop()
     {
+        // Set running flag to false and wait for the serverThread to finish
         Interlocked.Decrement(ref run);
         if(serverThread != null)
             serverThread.Join();
@@ -41,9 +46,9 @@ public class ServerUDP : Server
             socket.SendTo(buffer, len, SocketFlags.None, client);
             OnSend(new ServerMsgEventArgs(client, buffer, len));
         }
-        catch
+        catch(SocketException e)
         {
-            Debug.Log("Error sending");
+            Debug.Log(e);
         }
     }
 
@@ -51,7 +56,7 @@ public class ServerUDP : Server
     {
         try
         {
-            byte[] data = new byte[8192];
+            byte[] data = new byte[Constants.BUFF_SIZE];
             while (run > 0)
             {
                 while (socket.Available > 0)
@@ -60,16 +65,19 @@ public class ServerUDP : Server
                     try
                     {
                         int bytesRecv = socket.ReceiveFrom(data, ref client);
-                        //Debug.Log("Received " + bytesRecv + " bytes from " + client.ToString());
                         OnRecv(new ServerMsgEventArgs(client, data, bytesRecv));
                     }
-                    catch
+                    catch(SocketException e)
                     {
-                        //Debug.Log("Exception on receive but continuing ServerLoop. Available: " + socket.Available);
+                        // Disconnection of clients has to be handled by the application
+                        if(e.SocketErrorCode != SocketError.ConnectionReset)
+                            Debug.Log(e);
+
                         break;
                     }
                 }
 
+                // Do not starve other threads
                 Thread.Sleep(1);
             }
 

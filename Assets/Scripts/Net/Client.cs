@@ -3,6 +3,7 @@
 // Author: alexandre.via@i2cat.net
 
 using System;
+
 /// <summary>
 /// This base class contains the basic API that all clients must implement
 /// </summary>

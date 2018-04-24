@@ -2,6 +2,7 @@
 // See the LICENSE file in the project root for more information.
 // Author: alexandre.via@i2cat.net
 
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -10,51 +11,80 @@ using UnityEngine;
 public class ClientUDP : Client
 {
     private Socket socket;
-
     private EndPoint server;
-
     private Thread clientThread;
 
+    // Run flag, we use an int since booleans are not supported by Interlocked
     private int run = 1;
 
     public override void Start(string ip, int port)
     {
+        // Create non-blocking UDP socket
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         socket.Blocking = false;
 
+        // Cache server endPoint
         server = new IPEndPoint(IPAddress.Parse(ip), port);
 
+        // Start ClientLoop in a new thread
         clientThread = new Thread(new ThreadStart(ClientLoop));
         clientThread.Start();
     }
 
     public override void Stop()
     {
+        // Set running flag to false and wait for the clientThread to finish
         Interlocked.Decrement(ref run);
-        clientThread.Join();
+        if(clientThread != null)
+            clientThread.Join();
     }
 
     public override void Send(byte[] buffer, int len)
     {
-        socket.SendTo(buffer, len, SocketFlags.None, server);
-        OnSend(new ClientMsgEventArgs(buffer, len));
+        try
+        {
+            socket.SendTo(buffer, len, SocketFlags.None, server);
+            OnSend(new ClientMsgEventArgs(buffer, len));
+        }
+        catch(SocketException e)
+        {
+            Debug.Log(e);
+        }
     }
 
     private void ClientLoop()
     {
-        while (run > 0)
+        try
         {
-            byte[] data = new byte[socket.Available];
-            while (socket.Available > 0)
-            {
-                int bytesRecv = socket.ReceiveFrom(data, ref server);
-                OnRecv(new ClientMsgEventArgs(data, bytesRecv));
+            byte[] data = new byte[Constants.BUFF_SIZE];
+            while (run > 0)
+            {                
+                while (socket.Available > 0)
+                {
+                    try
+                    {
+                        int bytesRecv = socket.ReceiveFrom(data, ref server);
+                        OnRecv(new ClientMsgEventArgs(data, bytesRecv));
+                    }
+                    catch(SocketException e)
+                    {
+                        Debug.Log(e);
+                        socket.Close();
+                        // e.SocketErrorCode == SocketError.ConnectionReset
+                    }
+                }
+
+                // Do not starve other threads
+                Thread.Sleep(1);
             }
 
-            Thread.Sleep(1);
+            Debug.Log("[Client] Closing socket");
+            socket.Close();
         }
-
-        Debug.Log("[Client] Closing socket");
-        socket.Close();
+        catch(Exception e)
+        {
+            Debug.Log(e);
+            Debug.Log("Exception in ClientLoop!!");
+        }
     }
 }
