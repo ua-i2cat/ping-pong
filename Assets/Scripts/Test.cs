@@ -25,19 +25,20 @@ public class ServerTestTCP : ServerTCP
         {
             Debug.Log("OnSend " + e.Len + " bytes sent");
         };
+
+        ClientConnect += (object s, ConnectEventArgs e) =>
+        {
+            lastConnection = e.Socket;
+            Debug.Log("OnConnect " + e.Socket.RemoteEndPoint);
+        };
+
+        ClientDisconnect += (object s, ConnectEventArgs e) =>
+        {
+            Debug.Log("OnDisconnect");
+        };
     }
 
     public Socket lastConnection;
-    protected override void OnConnect(Socket socket)
-    {
-        lastConnection = socket;
-        Debug.Log("OnConnect " + socket.RemoteEndPoint);
-    }
-
-    protected override void OnDisconnect(Socket socket)
-    {
-        Debug.Log("OnDisconnect");
-    }
 }
 
 public class ClientTestUDP : ClientUDP
