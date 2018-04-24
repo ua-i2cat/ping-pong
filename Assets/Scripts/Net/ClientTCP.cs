@@ -1,12 +1,14 @@
-﻿using System;
+﻿// Licensed under the LGPL 3.0
+// See the LICENSE file in the project root for more information.
+// Author: alexandre.via@i2cat.net
+
+using System;
 using System.Net;
 using System.Net.Sockets;
-using UnityEngine;
 
 public class ClientTCP : Client
 {
     private Socket socket;
-
     private byte[] recvBuffer = new byte[8192];
 
     public override void Start(string ip, int port)
@@ -22,7 +24,8 @@ public class ClientTCP : Client
 
     public override void Send(byte[] buffer, int len)
     {
-        socket.BeginSend(buffer, 0, len, SocketFlags.None, new AsyncCallback(SendCallback), buffer);
+        if(socket.Connected)
+            socket.BeginSend(buffer, 0, len, SocketFlags.None, new AsyncCallback(SendCallback), buffer);
     }
 
     protected virtual void OnConnect()
@@ -44,9 +47,10 @@ public class ClientTCP : Client
             socket.BeginReceive(recvBuffer, 0, recvBuffer.Length, SocketFlags.None,
                 new AsyncCallback(ReceiveCallback), null);
         }
-        catch
+        catch(Exception e)
         {
-            Debug.Log("ConnectCallback error");
+            ErrorHandler(new System.IO.ErrorEventArgs(e));
+            //Debug.Log("ConnectCallback error");
         }
     }
 
@@ -65,13 +69,14 @@ public class ClientTCP : Client
                 OnDisconnect();
                 return;
             }
-            OnRecv(new ClientMsgEventArgs(recvBuffer, bytesRecv));
+            RecvHandler(new ClientMsgEventArgs(recvBuffer, bytesRecv));
             socket.BeginReceive(recvBuffer, 0, recvBuffer.Length, SocketFlags.None,
                 new AsyncCallback(ReceiveCallback), null);
         }
-        catch
+        catch(Exception e)
         {
-            Debug.Log("ReceiveCallback error");
+            ErrorHandler(new System.IO.ErrorEventArgs(e));
+            //Debug.Log("ReceiveCallback error");
         }
     }
 
@@ -81,11 +86,12 @@ public class ClientTCP : Client
         {
             byte[] buffer = (byte[])AR.AsyncState;
             int bytesSent = socket.EndSend(AR);
-            OnSend(new ClientMsgEventArgs(buffer, bytesSent));
+            SendHandler(new ClientMsgEventArgs(buffer, bytesSent));
         }
-        catch
+        catch(Exception e)
         {
-            Debug.Log("SendCallback error");
+            ErrorHandler(new System.IO.ErrorEventArgs(e));
+            //Debug.Log("SendCallback error");
         }
     }
 }

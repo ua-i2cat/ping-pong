@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 /// <summary>
 /// Specialization of the Server class using the TCP protocol
@@ -43,17 +44,41 @@ public class ServerTCP : Server
 
     public override void Send(EndPoint client, byte[] buffer, int len)
     {
-        // Find an active connection for the given client EndPoint
-        Socket socket = recvBuffers.Where(x => x.Key.RemoteEndPoint.Equals(client)).FirstOrDefault().Key;
+        try
+        {
+            int index = 0;
+            Packet p = PacketBuilder.Parse(buffer, ref index);
+            //if (p.Type != Packet.PacketType.Objects)
+            //    UnityEngine.Debug.Log("[S->C]: " + p.ToString());
 
-        // Send the packet asynchronously to the client
-        socket.BeginSend(buffer, 0, len, SocketFlags.None, new AsyncCallback(SendCallback), new Tuple<Socket, byte[]>(socket, buffer));
+            // Find an active connection for the given client EndPoint
+            var pair = recvBuffers.Where(x => x.Key.RemoteEndPoint != null && x.Key.RemoteEndPoint.Equals(client)).FirstOrDefault();
+
+            if (pair.Key != null)
+            {
+                // Get the socket from the connection
+                Socket socket = pair.Key;
+
+                //UnityEngine.Debug.Log("Send");
+
+                // Send the packet asynchronously to the client
+                socket.BeginSend(buffer, 0, len, SocketFlags.None, new AsyncCallback(SendCallback), new Tuple<Socket, byte[]>(socket, buffer));
+
+                Thread.Sleep(1);
+            }
+        }
+        catch(Exception e)
+        {
+            UnityEngine.Debug.LogError(e);
+            Console.WriteLine(e);
+        }
     }
 
     // Executed when there is an incomming connection
     public event ConnectEventHandler ClientConnect;
     private void OnConnect(ConnectEventArgs e)
     {
+        UnityEngine.Debug.Log("OnConnect " + e.Socket.RemoteEndPoint);
         ClientConnect?.Invoke(this, e);
     }
 
@@ -61,6 +86,7 @@ public class ServerTCP : Server
     public event ConnectEventHandler ClientDisconnect;
     private void OnDisconnect(ConnectEventArgs e)
     {
+        UnityEngine.Debug.Log("OnDisconnect");
         ClientDisconnect?.Invoke(this, e);
     }
 
@@ -75,14 +101,14 @@ public class ServerTCP : Server
 
             // Create a buffer and add it to the connection map
             recvBuffers.Add(socket, new byte[8192]);
-            byte[] recvBuffer = recvBuffers.Where(x => x.Key.RemoteEndPoint.Equals(socket.RemoteEndPoint)).FirstOrDefault().Value;
+            byte[] recvBuffer = recvBuffers.Where(x => x.Key.RemoteEndPoint != null && x.Key.RemoteEndPoint.Equals(socket.RemoteEndPoint)).FirstOrDefault().Value;
 
             // Start receiving packets asynchronously from the connected client
             socket.BeginReceive(recvBuffer, 0, recvBuffer.Length, SocketFlags.None, new AsyncCallback(RecvCallback), socket);
         }
         catch
         {
-            //Debug.Log("AcceptCallback error");
+            UnityEngine.Debug.Log("AcceptCallback error");
             throw new Exception("AcceptCallback error");
         }
 
@@ -99,13 +125,15 @@ public class ServerTCP : Server
         {
             int bytesRecv = socket.EndReceive(AR);
             byte[] recvBuffer = recvBuffers.Where(x => x.Key.RemoteEndPoint.Equals(socket.RemoteEndPoint)).FirstOrDefault().Value;
-            OnRecv(new ServerMsgEventArgs(socket.RemoteEndPoint, recvBuffer, bytesRecv));
+            RecvHandler(new ServerMsgEventArgs(socket.RemoteEndPoint, recvBuffer, bytesRecv));
 
             // Keep receiving packets
             socket.BeginReceive(recvBuffer, 0, recvBuffer.Length, SocketFlags.None, new AsyncCallback(RecvCallback), socket);
         }
-        catch
+        catch(Exception e)
         {
+            //UnityEngine.Debug.Log(e);
+            recvBuffers.Remove(socket);
             OnDisconnect(new ConnectEventArgs(socket));
             throw new Exception("RecvCallback error");
         }
@@ -118,11 +146,11 @@ public class ServerTCP : Server
             var tuple = (Tuple<Socket, byte[]>)AR.AsyncState;
             Socket socket = tuple.Item1;
             int bytesSent = socket.EndSend(AR);
-            OnSend(new ServerMsgEventArgs(socket.RemoteEndPoint, tuple.Item2, bytesSent));
+            SendHandler(new ServerMsgEventArgs(socket.RemoteEndPoint, tuple.Item2, bytesSent));
         }
         catch
         {
-            //Debug.Log("SendCallback error");
+            UnityEngine.Debug.Log("SendCallback error");
             throw new Exception("SendCallback error");
         }
     }

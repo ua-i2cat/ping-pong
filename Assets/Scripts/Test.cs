@@ -16,12 +16,12 @@ public class ServerTestTCP : ServerTCP
 {
     public ServerTestTCP()
     {
-        MsgRecv += (object s, ServerMsgEventArgs e) =>
+        OnRecv += (object s, ServerMsgEventArgs e) =>
         {
             Debug.Log("OnRecv " + e.Len + " bytes received from " + e.Client);
         };
 
-        MsgSent += (object s, ServerMsgEventArgs e) =>
+        OnSend += (object s, ServerMsgEventArgs e) =>
         {
             Debug.Log("OnSend " + e.Len + " bytes sent");
         };
@@ -45,12 +45,12 @@ public class ClientTestUDP : ClientUDP
 {
     public ClientTestUDP()
     {
-        MsgRecv += (object s, ClientMsgEventArgs e) =>
+        OnRecv += (object s, ClientMsgEventArgs e) =>
         {
             Debug.Log("OnSend " + e.Len + " bytes sent");
         };
 
-        MsgSent += (object s, ClientMsgEventArgs e) =>
+        OnSend += (object s, ClientMsgEventArgs e) =>
         {
             Debug.Log("OnRecv " + e.Len + " bytes received from the server");
         };
@@ -61,7 +61,7 @@ public class ClientTestTCP : ClientTCP
 {
     public ClientTestTCP()
     {
-        MsgRecv += (object s, ClientMsgEventArgs e) =>
+        OnRecv += (object s, ClientMsgEventArgs e) =>
         {
             string str = "";
             for (int i = 0; i < e.Len; i++)
@@ -81,7 +81,7 @@ public class ServerTestUDP : ServerUDP
 
     public ServerTestUDP()
     {
-        MsgRecv += (object s, ServerMsgEventArgs e) =>
+        OnRecv += (object s, ServerMsgEventArgs e) =>
         {
             HandleClientPacket(e.Buffer, e.Len);
 
@@ -140,7 +140,7 @@ public class Proxy : ServerUDP
 
     public Proxy()
     {
-        MsgRecv += (object s, ServerMsgEventArgs e) =>
+        OnRecv += (object s, ServerMsgEventArgs e) =>
         {
             Debug.Log("Proxy received " + e.Len + " bytes");
             p.Send(e.Buffer, e.Len);
@@ -198,7 +198,7 @@ public class Test : MonoBehaviour
     {
         // Create server, set handlers and start
         server = new ServerTCP();
-        server.MsgRecv += (object s, Server.ServerMsgEventArgs e) =>
+        server.OnRecv += (object s, Server.ServerMsgEventArgs e) =>
         {
             try
             {
@@ -215,7 +215,7 @@ public class Test : MonoBehaviour
                 Debug.Log("Error");
             }           
         };
-        server.MsgSent += (object s, Server.ServerMsgEventArgs e) =>
+        server.OnSend += (object s, Server.ServerMsgEventArgs e) =>
         {
             //Debug.Log("[Server] Message sent");
         };
@@ -225,7 +225,7 @@ public class Test : MonoBehaviour
         {
             // Create client, set handlers and start
             Client client = new ClientTCP();
-            client.MsgRecv += (object s, Client.ClientMsgEventArgs e) =>
+            client.OnRecv += (object s, Client.ClientMsgEventArgs e) =>
             {
                 //Debug.Log("[Client] Received: " + e.Len + " bytes");// Encoding.ASCII.GetString(e.Buffer));
 

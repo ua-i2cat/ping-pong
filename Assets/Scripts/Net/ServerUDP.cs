@@ -44,7 +44,7 @@ public class ServerUDP : Server
         try
         {
             socket.SendTo(buffer, len, SocketFlags.None, client);
-            OnSend(new ServerMsgEventArgs(client, buffer, len));
+            SendHandler(new ServerMsgEventArgs(client, buffer, len));
         }
         catch(SocketException e)
         {
@@ -65,7 +65,7 @@ public class ServerUDP : Server
                     try
                     {
                         int bytesRecv = socket.ReceiveFrom(data, ref client);
-                        OnRecv(new ServerMsgEventArgs(client, data, bytesRecv));
+                        RecvHandler(new ServerMsgEventArgs(client, data, bytesRecv));
                     }
                     catch(SocketException e)
                     {

@@ -17,7 +17,7 @@ public class Pilot1_ServerManager : MonoBehaviour
 
     private void Awake()
     {
-        server.MsgRecv += OnMsgRecv;
+        server.OnRecv += OnMsgRecv;
         server.Start(port);
     }
 
@@ -40,6 +40,6 @@ public class Pilot1_ServerManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         server.Stop();
-        server.MsgRecv -= OnMsgRecv;
+        server.OnRecv -= OnMsgRecv;
     }
 }

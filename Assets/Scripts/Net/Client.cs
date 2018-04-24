@@ -3,6 +3,7 @@
 // Author: alexandre.via@i2cat.net
 
 using System;
+using System.IO;
 
 /// <summary>
 /// This base class contains the basic API that all clients must implement
@@ -19,18 +20,25 @@ public abstract class Client
     public abstract void Send(byte[] buffer, int len);
 
     // Executed when a packet is sent
-    public event ClientMsgEventHandler MsgSent;
-    protected void OnSend(ClientMsgEventArgs e)
+    public event ClientMsgEventHandler OnSend;
+    protected void SendHandler(ClientMsgEventArgs e)
     {
-        MsgSent?.Invoke(this, e);
+        OnSend?.Invoke(this, e);
     }
 
     // Executed when a packet is received
-    public event ClientMsgEventHandler MsgRecv;
-    protected void OnRecv(ClientMsgEventArgs e)
+    public event ClientMsgEventHandler OnRecv;
+    protected void RecvHandler(ClientMsgEventArgs e)
     {
-        MsgRecv?.Invoke(this, e);
-    }    
+        OnRecv?.Invoke(this, e);
+    }
+
+    // Executed when an error happens
+    public event ErrorEventHandler OnError;
+    protected void ErrorHandler(ErrorEventArgs e)
+    {
+        OnError?.Invoke(this, e);
+    }
 
     public delegate void ClientMsgEventHandler(Object sender, ClientMsgEventArgs e);
 

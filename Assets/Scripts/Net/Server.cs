@@ -20,17 +20,17 @@ public abstract class Server
     public abstract void Send(EndPoint client, byte[] buffer, int len);
 
     // Executed when a packet is sent
-    public event ServerMsgEventHandler MsgSent;
-    protected void OnSend(ServerMsgEventArgs e)
+    public event ServerMsgEventHandler OnSend;
+    protected void SendHandler(ServerMsgEventArgs e)
     {
-        MsgSent?.Invoke(this, e);
+        OnSend?.Invoke(this, e);
     }
 
     // Executed when a packet is received
-    public event ServerMsgEventHandler MsgRecv;
-    protected void OnRecv(ServerMsgEventArgs e)
+    public event ServerMsgEventHandler OnRecv;
+    protected void RecvHandler(ServerMsgEventArgs e)
     {
-        MsgRecv?.Invoke(this, e);
+        OnRecv?.Invoke(this, e);
     }    
 
     public delegate void ServerMsgEventHandler(Object sender, ServerMsgEventArgs e);

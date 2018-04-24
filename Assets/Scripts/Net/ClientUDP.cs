@@ -3,6 +3,7 @@
 // Author: alexandre.via@i2cat.net
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -43,12 +44,16 @@ public class ClientUDP : Client
     {
         try
         {
-            socket.SendTo(buffer, len, SocketFlags.None, server);
-            OnSend(new ClientMsgEventArgs(buffer, len));
+            if (run > 0)
+            {
+                socket.SendTo(buffer, len, SocketFlags.None, server);
+                SendHandler(new ClientMsgEventArgs(buffer, len));
+            }
         }
         catch(SocketException e)
         {
-            Debug.Log(e);
+            //Debug.Log(e);
+            ErrorHandler(new ErrorEventArgs(e));
         }
     }
 
@@ -64,12 +69,14 @@ public class ClientUDP : Client
                     try
                     {
                         int bytesRecv = socket.ReceiveFrom(data, ref server);
-                        OnRecv(new ClientMsgEventArgs(data, bytesRecv));
+                        RecvHandler(new ClientMsgEventArgs(data, bytesRecv));
                     }
                     catch(SocketException e)
                     {
-                        Debug.Log(e);
-                        socket.Close();
+                        ErrorHandler(new ErrorEventArgs(e));
+                        //Debug.Log(e);
+                        if(socket != null && socket.Connected)
+                            socket.Close();
                         // e.SocketErrorCode == SocketError.ConnectionReset
                     }
                 }
@@ -83,8 +90,9 @@ public class ClientUDP : Client
         }
         catch(Exception e)
         {
-            Debug.Log(e);
-            Debug.Log("Exception in ClientLoop!!");
+            run = 0;
+            //Debug.Log("Exception in ClientLoop!!");
+            ErrorHandler(new ErrorEventArgs(e));
         }
     }
 }
